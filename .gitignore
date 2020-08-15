@@ -1,0 +1,10 @@
+.vscode
+
+build/
+data/
+lib/
+shaders/glslc
+
+app
+imgui.ini
+stat.txt
