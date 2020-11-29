@@ -1,0 +1,12 @@
+#define PI 3.14159265359
+#define TWO_PI 6.28318
+#define EPSILON 0.0001
+
+#define MAX_BOUNCES 2
+#define MAX_LEN 1000.0
+#define N_SAMPLE 16
+
+#define RAYBOUNCES 512
+#define REFLECTIONS true
+#define REFLECTIONSTRENGTH 0.2
+#define REFLECTIONFALLOFF 0.3
