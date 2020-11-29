@@ -1,3 +1,4 @@
+//file:///home/ql/Desktop/CG/src/vulkanbase.cpp {"mtime":1598641936447,"ctime":1597003025931,"size":36917,"etag":"35jh469cc17cr","orphaned":false}
 #include "vulkanbase.h"
 
 std::vector<const char*> VulkanBase::args;
@@ -121,6 +122,15 @@ void VulkanBase::nextFrame()
         viewChanged();
     }
 
+#if defined(VK_USE_PLATFORM_XCB_KHR)
+    xcb_generic_event_t *event;
+    while ((event = xcb_poll_for_event(connection)))
+    {
+        handleEvent(event);
+        free(event);
+    }
+#endif
+
     render();
     frameCounter++;
     auto tEnd = std::chrono::high_resolution_clock::now();
@@ -137,10 +147,10 @@ void VulkanBase::nextFrame()
         timer += timerSpeed * frameTimer;
         if (timer > 1.0) timer -= 1.0f;
     }
-    float fpsTimer = (float)(std::chrono::duration<double, std::milli>(tEnd - lastTimestamp).count());
+    float fpsTimer = std::chrono::duration<double, std::milli>(tEnd - lastTimestamp).count();
     if (fpsTimer > 1000.0f)
     {
-        lastFPS = static_cast<uint32_t>((float)frameCounter * (1000.0f / fpsTimer));
+        lastFPS = (float)frameCounter * (1000.0f / fpsTimer);
         frameCounter = 0;
         lastTimestamp = tEnd;
     }
@@ -173,45 +183,8 @@ void VulkanBase::renderLoop()
     xcb_flush(connection);
     while (!quit)
     {
-        auto tStart = std::chrono::high_resolution_clock::now();
-        if (viewUpdated)
-        {
-            viewUpdated = false;
-            viewChanged();
-        }
-        xcb_generic_event_t *event;
-        while ((event = xcb_poll_for_event(connection)))
-        {
-            handleEvent(event);
-            free(event);
-        }
-        render();
-        frameCounter++;
-        auto tEnd = std::chrono::high_resolution_clock::now();
-        auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
-        frameTimer = tDiff / 1000.0f;
-        camera.update(frameTimer);
-        if (camera.moving())
-        {
-            viewUpdated = true;
-        }
-        // Convert to clamped timer value
-        if (!paused)
-        {
-            timer += timerSpeed * frameTimer;
-            if (timer > 1.0)
-            {
-                timer -= 1.0f;
-            }
-        }
-        float fpsTimer = std::chrono::duration<double, std::milli>(tEnd - lastTimestamp).count();
-        if (fpsTimer > 1000.0f)
-        {
-            lastFPS = (float)frameCounter * (1000.0f / fpsTimer);
-            frameCounter = 0;
-            lastTimestamp = tEnd;
-        }
-        updateOverlay();
+        // if (prepared)
+        nextFrame();
     }
 #endif
     // Flush device to make sure all resources can be freed
@@ -237,10 +210,8 @@ void VulkanBase::updateOverlay()
 
     ImGui::Render();
 
-    if (UIOverlay.update() || UIOverlay.updated) {
+    if (UIOverlay.update())
         buildCommandBuffers();
-        UIOverlay.updated = false;
-    }
 }
 
 void VulkanBase::drawUI(const VkCommandBuffer commandBuffer)
@@ -290,9 +261,21 @@ VulkanBase::VulkanBase()
         exit(-1);
     }
 
+    parseCommandLineArgs();
 
-    char* numConvPtr;
 
+#if defined(VK_USE_PLATFORM_XCB_KHR)
+    initxcbConnection();
+#endif
+
+#if defined(_WIN32)
+    // Debug message callback will output to
+    setupDPIAwareness();
+#endif
+}
+
+void VulkanBase::parseCommandLineArgs()
+{
     // Parse command line arguments
     for (size_t i = 0; i < args.size(); i++)
     {
@@ -303,15 +286,6 @@ VulkanBase::VulkanBase()
             settings.fullscreen = true;
         }
     }
-
-#if defined(VK_USE_PLATFORM_XCB_KHR)
-    initxcbConnection();
-#endif
-
-#if defined(_WIN32)
-    // Debug message callback will output to
-    setupDPIAwareness();
-#endif
 }
 
 VulkanBase::~VulkanBase()
@@ -903,12 +877,12 @@ void VulkanBase::handleEvent(const xcb_generic_event_t *event)
         const xcb_configure_notify_event_t *cfgEvent = (const xcb_configure_notify_event_t *)event;
         if ((prepared) && ((cfgEvent->width != width) || (cfgEvent->height != height)))
         {
-                destWidth = cfgEvent->width;
-                destHeight = cfgEvent->height;
-                if ((destWidth > 0) && (destHeight > 0))
-                {
-                    windowResize();
-                }
+            destWidth = cfgEvent->width;
+            destHeight = cfgEvent->height;
+            if ((destWidth > 0) && (destHeight > 0))
+            {
+                windowResize();
+            }
         }
     }
     break;
@@ -1014,7 +988,7 @@ void VulkanBase::setupFrameBuffer()
 
 void VulkanBase::setupRenderPass()
 {
-    std::array<VkAttachmentDescription, 2> attachments = {};
+    VkAttachmentDescription attachments[2];
     // Color attachment
     attachments[0].format = swapChain.colorFormat;
     attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
@@ -1054,7 +1028,7 @@ void VulkanBase::setupRenderPass()
     subpassDescription.pResolveAttachments = nullptr;
 
     // Subpass dependencies for layout transitions
-    std::array<VkSubpassDependency, 2> dependencies;
+    VkSubpassDependency dependencies[2];
 
     dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[0].dstSubpass = 0;
@@ -1074,12 +1048,12 @@ void VulkanBase::setupRenderPass()
 
     VkRenderPassCreateInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-    renderPassInfo.pAttachments = attachments.data();
+    renderPassInfo.attachmentCount = static_cast<uint32_t>(2);
+    renderPassInfo.pAttachments = attachments;
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpassDescription;
-    renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
-    renderPassInfo.pDependencies = dependencies.data();
+    renderPassInfo.dependencyCount = static_cast<uint32_t>(2);
+    renderPassInfo.pDependencies = dependencies;
 
     VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
 }

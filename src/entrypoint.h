@@ -9,6 +9,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)    
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)                    \
 {                                                                                   \
     for (int32_t i = 0; i < __argc; i++) { VulkanApp::args.push_back(__argv[i]); }  \
+    App.parseCommandLineArgs();                                                     \
     App.initVulkan();                                                               \
     App.setupWindow(hInstance, WndProc);                                            \
     App.prepare();                                                                  \
@@ -27,6 +28,7 @@ static void handleEvent(const xcb_generic_event_t *event)                       
 int main(const int argc, const char *argv[])                                        \
 {                                                                                   \
     for (size_t i = 0; i < argc; i++) { VulkanApp::args.push_back(argv[i]); }       \
+    App.parseCommandLineArgs();                                                     \
     App.initVulkan();                                                               \
     App.setupWindow();                                                              \
     App.prepare();                                                                  \

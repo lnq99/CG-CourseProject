@@ -8,3 +8,7 @@ shaders/glslc
 app
 imgui.ini
 stat.txt
+
+Makefile
+CMakeFiles/
+*.cmake

@@ -94,7 +94,7 @@ vec3 materialBrdf(SurfaceInteraction si,vec3 viewDir,vec3 lightDir,float cosThet
 {
     vec3 halfVector=normalize(viewDir+lightDir);
 
-    cosThetaL=abs(cosThetaL);32
+    cosThetaL=abs(cosThetaL);
     float cosThetaV=abs(dot(si.normal,viewDir));
     float cosThetaH=abs(dot(si.normal,halfVector));
     float cosThetaD=abs(dot(lightDir,halfVector));

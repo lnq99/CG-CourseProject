@@ -1,12 +1,21 @@
 #include "intersect.glsl"
 #include "bsdf.glsl"
 
-
 float lightDiffuse(vec3 normal, vec3 lightDir)
 {
-    return clamp(dot(normal, lightDir), 0.1, 1);
-    return clamp(dot(normal, lightDir), 0.1, 1) / pow(length(lightDir), 2);
+    return clamp(dot(normal, lightDir), 0.1, 1.0);
 }
+
+// float lightDiffuse(vec3 normal, vec3 lightDir)
+// {
+//     return clamp(dot(normal, lightDir), 0.1, 1);
+//     return clamp(dot(normal, lightDir), 0.1, 1) / pow(length(lightDir), 2);
+// }
+
+// float lightDiffuse2(vec3 normal, vec3 lightDir)
+// {
+//     return clamp(dot(normal, lightDir), 0, 1) / pow(length(lightDir), 2);
+// }
 
 vec3 lightDiffuse2(vec3 normal, vec3 lightDir, Material m)
 {
@@ -130,7 +139,7 @@ vec3 getColor(inout Ray r)
 
     if (id == -1) return vec3(0);
 
-    if (id < ubo.n)
+    if (id < spheres.length())
     {
         t = sphereIntersect(r, spheres[id]);
 
@@ -153,7 +162,7 @@ vec3 getColor(inout Ray r)
 
         color = diffuse * spheres[id].material.baseColor + specular;
     }
-    else if ((id -= ubo.n) < planes.length())
+    else if ((id -= spheres.length()) < planes.length())
     {
         t = planeIntersect(r, planes[id]);
 
@@ -181,4 +190,3 @@ vec3 getColor(inout Ray r)
 
     return color;
 }
-

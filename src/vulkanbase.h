@@ -10,34 +10,18 @@
 #include <xcb/xcb.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
-#include <array>
-#include <numeric>
-#include <ctime>
 #include <iostream>
 #include <chrono>
-#include <random>
-#include <algorithm>
 #include <sys/stat.h>
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <string>
-#include <numeric>
-#include <array>
+// #include <glm/glm.hpp>
+// #include <glm/gtc/matrix_transform.hpp>
+// #include <glm/gtc/matrix_inverse.hpp>
+// #include <glm/gtc/type_ptr.hpp>
 
 #include "vulkan/vulkan.h"
 
-#include "keycodes.hpp"
+#include "keycodes.h"
 #include "VulkanTools.h"
 #include "VulkanUIOverlay.h"
 #include "VulkanSwapChain.h"
@@ -52,9 +36,10 @@ class VulkanBase
 {
 private:
     bool viewUpdated = false;
+    bool resizing = false;
     uint32_t destWidth;
     uint32_t destHeight;
-    bool resizing = false;
+
     void windowResize();
     void handleMouseMove(int32_t x, int32_t y);
     void nextFrame();
@@ -84,9 +69,9 @@ protected:
     VkPhysicalDeviceFeatures deviceFeatures;
     // Stores all available memory (type) properties for the physical device
     VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
-    /** @brief Set of physical device features to be enabled for this example (must be set in the derived constructor) */
+    /** @brief Set of physical device features to be enabled (must be set in the derived constructor) */
     VkPhysicalDeviceFeatures enabledFeatures{};
-    /** @brief Set of device extensions to be enabled for this example (must be set in the derived constructor) */
+    /** @brief Set of device extensions to be enabled (must be set in the derived constructor) */
     std::vector<const char*> enabledDeviceExtensions;
     std::vector<const char*> enabledInstanceExtensions;
     /** @brief Optional pNext structure for passing extension structures to device creation */
@@ -127,6 +112,7 @@ protected:
         VkSemaphore renderComplete;
     } semaphores;
     std::vector<VkFence> waitFences;
+
 public:
     bool prepared = false;
     uint32_t width = 1280;
@@ -140,12 +126,10 @@ public:
     /** @brief Encapsulated physical and logical vulkan device */
     vks::VulkanDevice *vulkanDevice;
 
-    /** @brief Example settings that can be changed e.g. by command line arguments */
     struct Settings {
-        /** @brief Set to true if fullscreen mode has been requested via command line */
         bool fullscreen = false;
-        /** @brief Set to true if v-sync will be forced for the swapchain */
         bool vsync = false;
+        bool discrete = true;
     } settings;
 
     VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
@@ -192,6 +176,7 @@ public:
 
     VulkanBase();
     virtual ~VulkanBase();
+    void parseCommandLineArgs();
     /** @brief Setup the vulkan instance, enable required extensions and connect to the physical device (GPU) */
     bool initVulkan();
 

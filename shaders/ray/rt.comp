@@ -33,7 +33,7 @@ void main()
 {
     ivec2 dim = imageSize(IMG);
 
-    vec2 uv = vec2(gl_GlobalInvocationID.xy) / dim * 2 - 1;
+    vec2 uv = vec2(gl_GlobalInvocationID.xy) / dim * 4 - 2;
 
     Ray r = Ray(
         ubo.camera.pos,

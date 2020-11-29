@@ -8,7 +8,7 @@
 #define TEX_DIM_W 1280
 #define TEX_DIM_H 720
 
-#define N_SPHERE 8
+#define N_SPHERE 6
 
 
 class VulkanApp : public VulkanBase
@@ -46,45 +46,9 @@ public:
         VkPipeline pipeline;                        // Compute raytracing pipeline
     } compute;
 
-    VulkanApp(void (*createScene)(Scene *))
-        : VulkanBase()
-        , scene(Scene::instance())
-    {
-        title = "Compute shader ray tracing";
-        scene.ubo.aspectRatio = (float)width / (float)height;
-        // timerSpeed *= 0.25f;
+    VulkanApp(void (*setupCamera)(Camera &), void (*createScene)(Scene &));
 
-        camera.setPerspective(60.0f, (float)width / (float)height, 0.1f, 512.0f);
-        camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-        camera.setTranslation(glm::vec3(0.0f, 0.0f, -4.0f));
-        camera.rotationSpeed = 0.0f;
-        camera.movementSpeed = 2.5f;
-
-        createScene(&scene);
-    }
-
-    ~VulkanApp()
-    {
-        // Graphics
-        vkDestroyPipeline(device, graphics.pipeline, nullptr);
-        vkDestroyPipelineLayout(device, graphics.pipelineLayout, nullptr);
-        vkDestroyDescriptorSetLayout(device, graphics.descriptorSetLayout, nullptr);
-
-        // Compute
-        vkDestroyPipeline(device, compute.pipeline, nullptr);
-        vkDestroyPipelineLayout(device, compute.pipelineLayout, nullptr);
-        vkDestroyDescriptorSetLayout(device, compute.descriptorSetLayout, nullptr);
-        vkDestroyFence(device, compute.fence, nullptr);
-        vkDestroyCommandPool(device, compute.commandPool, nullptr);
-
-        compute.uniformBuffer.destroy();
-        compute.storageBuffers.spheres.destroy();
-        compute.storageBuffers.planes.destroy();
-        compute.stagingBuffer1.destroy();
-        compute.stagingBuffer2.destroy();
-
-        textureComputeTarget.destroy();
-    }
+    ~VulkanApp();
 
     // Prepare a texture target that is used to store compute shader calculations
     void prepareTextureTarget(vks::Texture *tex, uint32_t width, uint32_t height, VkFormat format);

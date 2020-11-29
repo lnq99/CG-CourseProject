@@ -1,5 +1,45 @@
 #include "app.h"
 
+#define LOCAL_SIZE 16
+
+VulkanApp::VulkanApp(void (*setupCamera)(Camera &), void (*createScene)(Scene &))
+    : VulkanBase()
+    , scene(Scene::instance())
+{
+    title = "Compute shader - ray tracing";
+
+    scene.ubo.lightPos = { 0, 3.8, 0 };
+    scene.ubo.aspectRatio = (float)width / (float)height;
+    timerSpeed *= 0.8f;
+
+    setupCamera(camera);
+    createScene(scene);
+}
+
+
+VulkanApp::~VulkanApp()
+{
+    // Graphics
+    vkDestroyPipeline(device, graphics.pipeline, nullptr);
+    vkDestroyPipelineLayout(device, graphics.pipelineLayout, nullptr);
+    vkDestroyDescriptorSetLayout(device, graphics.descriptorSetLayout, nullptr);
+
+    // Compute
+    vkDestroyPipeline(device, compute.pipeline, nullptr);
+    vkDestroyPipelineLayout(device, compute.pipelineLayout, nullptr);
+    vkDestroyDescriptorSetLayout(device, compute.descriptorSetLayout, nullptr);
+    vkDestroyFence(device, compute.fence, nullptr);
+    vkDestroyCommandPool(device, compute.commandPool, nullptr);
+
+    compute.uniformBuffer.destroy();
+    compute.storageBuffers.spheres.destroy();
+    compute.storageBuffers.planes.destroy();
+    compute.stagingBuffer1.destroy();
+    compute.stagingBuffer2.destroy();
+
+    textureComputeTarget.destroy();
+}
+
 
 // Prepare a texture target that is used to store compute shader calculations
 void VulkanApp::prepareTextureTarget(vks::Texture *tex, uint32_t width, uint32_t height, VkFormat format)
@@ -156,7 +196,7 @@ void VulkanApp::buildComputeCommandBuffer()
     vkCmdBindPipeline(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipeline);
     vkCmdBindDescriptorSets(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipelineLayout, 0, 1, &compute.descriptorSet, 0, 0);
 
-    vkCmdDispatch(compute.commandBuffer, textureComputeTarget.width / 16, textureComputeTarget.height / 16, 1);
+    vkCmdDispatch(compute.commandBuffer, textureComputeTarget.width / LOCAL_SIZE, textureComputeTarget.height / LOCAL_SIZE, 1);
 
     vkEndCommandBuffer(compute.commandBuffer);
 }
@@ -415,7 +455,7 @@ void VulkanApp::preparePipelines()
             0);
 
     // Display pipeline
-    std::array<VkPipelineShaderStageCreateInfo,2> shaderStages;
+    VkPipelineShaderStageCreateInfo shaderStages[2];
 
     shaderStages[0] = loadShader(getShadersPath() + "texture.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
     shaderStages[1] = loadShader(getShadersPath() + "texture.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -441,8 +481,8 @@ void VulkanApp::preparePipelines()
     pipelineCreateInfo.pViewportState = &viewportState;
     pipelineCreateInfo.pDepthStencilState = &depthStencilState;
     pipelineCreateInfo.pDynamicState = &dynamicState;
-    pipelineCreateInfo.stageCount = shaderStages.size();
-    pipelineCreateInfo.pStages = shaderStages.data();
+    pipelineCreateInfo.stageCount = 2;
+    pipelineCreateInfo.pStages = shaderStages;
     pipelineCreateInfo.renderPass = renderPass;
 
     VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &graphics.pipeline));
@@ -507,7 +547,7 @@ void VulkanApp::updateUniformBuffers()
     scene.ubo.lightPos.z = 0.0f + cos(glm::radians(timer * 360.0f)) * 2.0f;
     scene.ubo.camera.pos = camera.position * -1.0f;
     
-    scene.ubo.n = scene.spheres.size();
+    // scene.ubo.n = scene.spheres.size();
 
     VK_CHECK_RESULT(compute.uniformBuffer.map());
     memcpy(compute.uniformBuffer.mapped, &scene.ubo, sizeof(scene.ubo));
@@ -575,9 +615,6 @@ void VulkanApp::updateSphere()
     auto nSphere = scene.spheres.size();
     if (scene.selected < nSphere)
         scene.spheres[scene.selected].pos = controller.translate;
-
-    if (rand() % 60 == 0 && nSphere < N_SPHERE)
-        scene.addSphere(glm::vec3((rand() % 10 / 5.f - 1) * 3, (rand() % 10 / 5.f - 1) * 3, (rand() % 10 / 5.f - 1) * 2), (rand() % 10 + 1) / 5.f, glm::vec3(0.0f, 1.0f, 0.0f), 32.0f);
 
     VK_CHECK_RESULT(compute.stagingBuffer1.map());
     memcpy(compute.stagingBuffer1.mapped, scene.spheres.data(), nSphere * sizeof(Sphere));

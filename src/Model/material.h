@@ -9,5 +9,6 @@ struct Material
     float metallic;
     float specular;
     float roughness;
-    float transmission;
-} __attribute__((packed));
+    float trans;
+    float transRough;
+};

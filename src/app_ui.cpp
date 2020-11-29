@@ -21,7 +21,7 @@ void VulkanApp::OnUpdateUIOverlay()
     float tr[4] = { 1.0f, 0.8, 0.7, 0.5 };
 
 
-    if (UIOverlay.header("Scene"))
+    if (ImGui::CollapsingHeader("Scene", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Spacing();
 
@@ -85,7 +85,7 @@ void VulkanApp::OnUpdateUIOverlay()
 
     ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
-    if (UIOverlay.header("Object Manager"))
+    if (ImGui::CollapsingHeader("Object Manager", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Spacing();
 

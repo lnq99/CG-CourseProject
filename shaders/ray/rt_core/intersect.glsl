@@ -50,7 +50,7 @@ int intersect(in Ray r, inout float tRest)
         tMin = t;
     }
 
-    for (int i = 0; i < ubo.n; i++)
+    for (int i = 0; i < spheres.length(); i++)
     {
         t = sphereIntersect(r, spheres[i]);
 
@@ -67,7 +67,7 @@ int intersect(in Ray r, inout float tRest)
 
         if (t > EPSILON && t < tMin)
         {
-            id = i + ubo.n;
+            id = i + spheres.length();
             tMin = t;
         }
     }

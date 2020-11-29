@@ -28,8 +28,8 @@ struct Sphere
 {
     Material material;
     vec3 pos;
-    float radius;
     int id;
+    float radius;
     // vec3 _pad;
 };
 
@@ -65,10 +65,8 @@ layout (binding = 1) uniform UBO
 {
     vec3 lightPos;
     float aspectRatio;
-    vec4 fogColor;
     Camera camera;
-    mat4 rotMat;
-    int n;
+    // mat4 rotMat;
 } ubo;
 
 layout (std140, binding = 2) buffer Spheres
