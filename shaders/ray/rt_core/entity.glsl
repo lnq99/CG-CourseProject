@@ -28,18 +28,25 @@ struct Sphere
 {
     Material material;
     vec3 pos;
-    int id;
     float radius;
-    // vec3 _pad;
 };
 
 struct Plane
 {
     Material material;
     vec3 normal;
-    int id;
     float distance;
-    // vec3 _pad;
+};
+
+struct Triangle
+{
+    // Material material;
+    vec3 v0;
+    // int _pad0;
+    vec3 v1;
+    // int _pad1;
+    vec3 v2;
+    // int _pad2;
 };
 
 // struct Sphere
@@ -79,10 +86,23 @@ layout (std140, binding = 3) buffer Planes
     Plane planes[ ];
 };
 
+layout (std430, binding = 4) buffer Triangles
+{
+    Triangle triangles[ ];
+};
 
 vec3 sphereNormal(in vec3 pos, in Sphere sphere)
 {
     return (pos - sphere.pos) / sphere.radius;
+}
+
+vec3 triangleNormal(in Ray r, in Triangle tr)
+{
+    vec3 v1v0 = tr.v1 - tr.v0;
+    vec3 v2v0 = tr.v2 - tr.v0;
+    vec3 rov0 = r.o - tr.v0;
+    vec3  n = cross(v1v0, v2v0);
+    return n;
 }
 
 

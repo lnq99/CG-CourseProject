@@ -34,8 +34,10 @@ VulkanApp::~VulkanApp()
     compute.uniformBuffer.destroy();
     compute.storageBuffers.spheres.destroy();
     compute.storageBuffers.planes.destroy();
+    compute.storageBuffers.triangles.destroy();
     compute.stagingBuffer1.destroy();
     compute.stagingBuffer2.destroy();
+    compute.stagingBuffer3.destroy();
 
     textureComputeTarget.destroy();
 }
@@ -269,16 +271,21 @@ void VulkanApp::prepareCompute()
             VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
             VK_SHADER_STAGE_COMPUTE_BIT,
             1),
-        // Binding 1: Shader storage buffer for the spheres
+        // Binding 2: Shader storage buffer for the spheres
         vks::initializers::descriptorSetLayoutBinding(
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             VK_SHADER_STAGE_COMPUTE_BIT,
             2),
-        // Binding 1: Shader storage buffer for the planes
+        // Binding 3: Shader storage buffer for the planes
         vks::initializers::descriptorSetLayoutBinding(
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             VK_SHADER_STAGE_COMPUTE_BIT,
-            3)
+            3),
+        // Binding 4: Shader storage buffer for the triangles
+        vks::initializers::descriptorSetLayoutBinding(
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            VK_SHADER_STAGE_COMPUTE_BIT,
+            4)
     };
 
     VkDescriptorSetLayoutCreateInfo descriptorLayout =
@@ -323,12 +330,18 @@ void VulkanApp::prepareCompute()
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             2,
             &compute.storageBuffers.spheres.descriptor),
-        // Binding 2: Shader storage buffer for the planes
+        // Binding 3: Shader storage buffer for the planes
         vks::initializers::writeDescriptorSet(
             compute.descriptorSet,
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             3,
-            &compute.storageBuffers.planes.descriptor)
+            &compute.storageBuffers.planes.descriptor),
+        // Binding 4: Shader storage buffer for the triangles
+        vks::initializers::writeDescriptorSet(
+            compute.descriptorSet,
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            4,
+            &compute.storageBuffers.triangles.descriptor)
     };
 
     vkUpdateDescriptorSets(device, computeWriteDescriptorSets.size(), computeWriteDescriptorSets.data(), 0, NULL);
@@ -537,6 +550,30 @@ void VulkanApp::prepareStorageBuffers()
     copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
     copyRegion.size = storageBufferSize;
     vkCmdCopyBuffer(copyCmd, compute.stagingBuffer2.buffer, compute.storageBuffers.planes.buffer, 1, &copyRegion);
+    vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+
+
+    storageBufferSize = scene.triangles.size() * sizeof(Triangle);
+
+    // Stage
+    vulkanDevice->createBuffer(
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        &compute.stagingBuffer3,
+        storageBufferSize,
+        scene.triangles.data());
+
+    vulkanDevice->createBuffer(
+        // The SSBO will be used as a storage buffer for the compute pipeline and as a vertex buffer in the graphics pipeline
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        &compute.storageBuffers.triangles,
+        storageBufferSize);
+
+    // Copy to staging buffer
+    copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+    copyRegion.size = storageBufferSize;
+    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer3.buffer, compute.storageBuffers.triangles.buffer, 1, &copyRegion);
     vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 }
 

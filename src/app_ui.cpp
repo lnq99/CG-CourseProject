@@ -44,17 +44,17 @@ void VulkanApp::OnUpdateUIOverlay()
 
         ImGui::Spacing();
 
-
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
-        ImGui::BeginChild("Sphere", ImVec2(100, 180), true, ImGuiWindowFlags_HorizontalScrollbar);
-
         auto nSpheres = scene.spheres.size();
         auto nPlanes = scene.planes.size();
-        auto size = nSpheres + nPlanes;
+        auto nTriangles = scene.triangles.size();
+        // auto size = nSpheres + nPlanes;
         int n = nSpheres;
 
         char buf[24];
 
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX());
+    
+        ImGui::BeginChild("Sphere", ImVec2(110, 180), true, ImGuiWindowFlags_HorizontalScrollbar);
         for (int i = 0; i < nSpheres; i++)
         {
             sprintf(buf, "%02d | %s %d", i, "Sphere", i);
@@ -63,13 +63,11 @@ void VulkanApp::OnUpdateUIOverlay()
                 scene.selected = i;
             }
         }
-
         ImGui::EndChild();
 
         ImGui::SameLine();
 
-        ImGui::BeginChild("Plane", ImVec2(100, 180), true, ImGuiWindowFlags_HorizontalScrollbar);
-
+        ImGui::BeginChild("Plane", ImVec2(110, 180), true, ImGuiWindowFlags_HorizontalScrollbar);
         for (int i = 0; i < nPlanes; i++, n++)
         {
             sprintf(buf, "%02d | %s %d", n, "Plane ", i);
@@ -78,7 +76,19 @@ void VulkanApp::OnUpdateUIOverlay()
                 scene.selected = n;
             }
         }
+        ImGui::EndChild();
 
+        ImGui::SameLine();
+
+        ImGui::BeginChild("Triangle", ImVec2(110, 180), true, ImGuiWindowFlags_HorizontalScrollbar);
+        for (int i = 0; i < nTriangles; i++, n++)
+        {
+            sprintf(buf, "%02d | %s %d", n, "Triangle ", i);
+            if (ImGui::Selectable(buf, scene.selected == n))
+            {
+                scene.selected = n;
+            }
+        }
         ImGui::EndChild();
 
     }

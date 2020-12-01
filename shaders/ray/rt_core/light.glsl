@@ -183,6 +183,20 @@ vec3 getColor(inout Ray r)
 
         color = diffuse * planes[id].material.baseColor + specular;
     }
+    else if ((id -= planes.length()) < triangles.length())
+    {
+        t = triangleIntersect(r, triangles[id]);
+
+        normal = triangleNormal(r, triangles[id]);
+        Ray rtmp = Ray(pos, lightVec);
+
+        if (intersect(rtmp, t) < 0)
+        {
+            diffuse = lightDiffuse(normal, lightVec);
+            specular = lightSpecular(normal, lightVec, 0.5);
+            color = diffuse * vec3(1, 1, 0) + specular;
+        }
+    }
 
     r.o = pos;
     r.d += 2 * -dot(normal, r.d) * normal;

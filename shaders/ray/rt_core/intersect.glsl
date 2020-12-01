@@ -25,6 +25,31 @@ float planeIntersect(in Ray r, in Plane p)
     return t;
 }
 
+float triangleIntersect(in Ray r, in Triangle tr)
+{
+    vec3 v1v0 = tr.v1 - tr.v0;
+    vec3 v2v0 = tr.v2 - tr.v0;
+    vec3 rov0 = r.o - tr.v0;
+
+    // Cramer's rule for solcing p(t) = ro+t·rd = p(u,v) = vo + u·(v1-v0) + v·(v2-v1)
+    // float d = 1.0/determinant(mat3(v1v0, v2v0, -r.d ));
+    // float u =   d*determinant(mat3(rov0, v2v0, -r.d ));
+    // float v =   d*determinant(mat3(v1v0, rov0, -r.d ));
+    // float t =   d*determinant(mat3(v1v0, v2v0, rov0));
+
+    vec3  n = cross(v1v0, v2v0);
+    vec3  q = cross(rov0, r.d);
+    float d = 1.0 / dot(r.d, n);
+    float u = d * dot(-q, v2v0);
+    float v = d * dot( q, v1v0);
+    float t = d * dot(-n, rov0);
+
+    if (u < 0.0 || v < 0.0 || (u+v) > 1.0)
+        t = -1.0;
+
+    return t;
+}
+
 int intersect(in Ray r, inout float tRest)
 // int intersect(in Ray r, inout Path p)
 {
@@ -38,7 +63,6 @@ int intersect(in Ray r, inout float tRest)
     Sphere light = Sphere(
         m,
         ubo.lightPos,
-        -2,
         0.05
     );
 
@@ -68,6 +92,17 @@ int intersect(in Ray r, inout float tRest)
         if (t > EPSILON && t < tMin)
         {
             id = i + spheres.length();
+            tMin = t;
+        }
+    }
+
+    for (int i = 0; i < triangles.length(); i++)
+    {
+        t = triangleIntersect(r, triangles[i]);
+
+        if (t > EPSILON && t < tMin)
+        {
+            id = i + spheres.length() + planes.length();
             tMin = t;
         }
     }

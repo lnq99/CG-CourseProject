@@ -32,9 +32,11 @@ public:
         struct {
             vks::Buffer spheres;                        // (Shader) storage buffer object with scene spheres
             vks::Buffer planes;                        // (Shader) storage buffer object with scene planes
+            vks::Buffer triangles;
         } storageBuffers;
         vks::Buffer stagingBuffer1;
         vks::Buffer stagingBuffer2;
+        vks::Buffer stagingBuffer3;
         vks::Buffer uniformBuffer;                    // Uniform buffer object containing scene data
         VkQueue queue;                                // Separate queue for compute commands (queue family may differ from the one used for graphics)
         VkCommandPool commandPool;                    // Use a separate command pool (queue family may differ from the one used for graphics)
