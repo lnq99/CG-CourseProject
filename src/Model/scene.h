@@ -29,9 +29,8 @@ public:
 
 public:
     static Scene& instance();
-    void unSelect();
-    void addSphere(glm::vec3 pos, float radius, Material = { glm::vec3(1), 0, 0.5, 0.5, 0, 0 });
-    void addPlane(glm::vec3 normal, float distance, Material = { glm::vec3(1), 0, 0.5, 0.5, 0, 0 });
+    void addSphere(glm::vec3 pos, float radius, Material = { glm::vec3(1), 0, 0.1, 0.5, 0, 0 });
+    void addPlane(glm::vec3 normal, float distance, Material = { glm::vec3(1), 0, 0, 0.5, 0, 0 });
 
 private:
     Scene();

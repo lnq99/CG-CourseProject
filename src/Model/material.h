@@ -2,7 +2,7 @@
 
 #include <glm/vec3.hpp>
 
-// base on principled bdpf
+// base on principled bsdf
 struct Material
 {
     glm::vec3 baseColor;    // TODO: texture

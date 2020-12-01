@@ -3,7 +3,14 @@
 
 float lightDiffuse(vec3 normal, vec3 lightDir)
 {
-    return clamp(dot(normal, lightDir), 0.1, 1.0);
+    return clamp(dot(normal, lightDir), 0, 1);
+}
+
+float lightSpecular(vec3 normal, vec3 lightDir, float specularFactor)
+{
+    vec3 viewVec = normalize(ubo.camera.pos);
+    vec3 halfVec = normalize(lightDir + viewVec);
+    return specularFactor * pow(clamp(dot(normal, halfVec), 0, 1), 32);
 }
 
 // float lightDiffuse(vec3 normal, vec3 lightDir)
@@ -113,12 +120,6 @@ vec3 BRDF(vec3 n, vec3 l, Material m, Ray r) {
     return Fr + Fd;
 }
 
-float lightSpecular(vec3 normal, vec3 lightDir, float specularFactor)
-{
-    vec3 viewVec = normalize(ubo.camera.pos);
-    vec3 halfVec = normalize(lightDir + viewVec);
-    return specularFactor * pow(clamp(dot(normal, halfVec), 0, 1), 32);
-}
 
 vec3 getColor(inout Ray r)
 {
@@ -133,7 +134,7 @@ vec3 getColor(inout Ray r)
     vec3 pos = r.o + t * r.d;
     vec3 lightVec = normalize(ubo.lightPos - pos);
 
-    float diffuse = 0.1, specular = 0;
+    float diffuse = 0, specular = 0;
 
     if (id == -2) return vec3(2);
 
@@ -182,11 +183,9 @@ vec3 getColor(inout Ray r)
 
         color = diffuse * planes[id].material.baseColor + specular;
     }
-    // else
-    // {
-        r.o = pos;
-        r.d += 2 * -dot(normal, r.d) * normal;
-    // }
+
+    r.o = pos;
+    r.d += 2 * -dot(normal, r.d) * normal;
 
     return color;
 }

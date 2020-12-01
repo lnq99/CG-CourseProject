@@ -21,9 +21,9 @@ static void createScene(Scene &s)
 
 
     // Spheres
-    s.addSphere(glm::vec3(2.75, -0.5, 0), 1, {glm::vec3(0, 1, 0), 0.3, 0.6, 0.5});
-    s.addSphere(glm::vec3(0, 1, -0.5), 1, {glm::vec3(0.65, 0.77, 0.97f), 0, 0.6, 0.8});
-    s.addSphere(glm::vec3(-1.75, -0.75, -0.5f), 1.25, {glm::vec3(0.9, 0.76, 0.46f), 1, 0.6, 0.2});
+    s.addSphere(glm::vec3(2.75, -0.5, 0), 1, {glm::vec3(0, 1, 0), 0.3, 0, 0.5});
+    s.addSphere(glm::vec3(0, 1, -0.5), 1, {glm::vec3(0.65, 0.77, 0.97f), 0, 1, 0.8});
+    s.addSphere(glm::vec3(-1.75, -0.75, -0.5f), 1.25, {glm::vec3(0.9, 0.76, 0.46f), 0.5, 0.6, 0.2});
 
     // Planes
     const float halfEdge = 4;
