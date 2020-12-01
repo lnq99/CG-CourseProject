@@ -1,4 +1,4 @@
-file(GLOB BASE_SRC "*.cpp" "*.hpp")
+file(GLOB BASE_SRC "*.cpp")
 file(GLOB BASE_HEADERS "*.hpp")
 
 if(WIN32)

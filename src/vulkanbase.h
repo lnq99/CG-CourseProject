@@ -140,7 +140,7 @@ public:
     // For use in animations, rotations, etc.
     float timer = 0.0f;
     // Multiplier for speeding up (or slowing down) the global timer
-    float timerSpeed = 0.25f;
+    float timerSpeed = 0.2f;
     bool paused = false;
 
     Camera camera;

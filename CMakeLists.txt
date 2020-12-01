@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
-# set(CMAKE_CXX_COMPILER g++-10)
 
 project(RayTracing)
 
+# set(CMAKE_CXX_COMPILER g++-10)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -13,7 +13,7 @@ include_directories(vkbase)
 
 
 # file(GLOB SOURCE *.cpp)
-# add_definitions(-DNDEBUG)
+add_definitions(-DNDEBUG)
 add_definitions(-DVK_DATA_DIR=\"${CMAKE_SOURCE_DIR}/data/\")
 
 

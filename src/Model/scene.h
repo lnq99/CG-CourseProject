@@ -11,10 +11,9 @@ struct SceneUBO
 {
     glm::vec3 lightPos;
     float aspectRatio;
-    struct {
-        glm::vec3 pos = glm::vec3(0.0f, 0.0f, 4.0f);
-    } camera;
+    glm::vec3 pos = glm::vec3(0.0f, 0.0f, 4.0f);
     uint pad;
+    glm::mat4 rot;
     // uint n;
 };
 
@@ -26,7 +25,7 @@ public:
     std::vector<Sphere> spheres;
     std::vector<Triangle> triangles;
     SceneUBO ubo;
-    uint32_t selected;
+    uint32_t selected = -1;
 
 public:
     static Scene& instance();

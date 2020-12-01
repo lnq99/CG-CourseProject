@@ -5,10 +5,10 @@
 static void setupCamera(Camera &c)
 {
     // c.setPerspective(45.0f, (float)width / (float)height, 0, 256);
-    // c.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+    c.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
     c.setTranslation(glm::vec3(0.0f, 0.0f, -4.0f));
-    c.rotationSpeed = 0.05f;
-    c.movementSpeed = 2.5f;
+    c.rotationSpeed = 0.1f;
+    c.movementSpeed = 2.f;
 }
 
 static void createScene(Scene &s)
@@ -21,40 +21,18 @@ static void createScene(Scene &s)
 
 
     // Spheres
-    s.addSphere(glm::vec3(2.75, -0.5, 0), 1, {glm::vec3(0, 1, 0), 0.3, 0, 0.5});
-    s.addSphere(glm::vec3(0, 1, -0.5), 1, {glm::vec3(0.65, 0.77, 0.97f), 0, 1, 0.8});
-    s.addSphere(glm::vec3(-1.75, -0.75, -0.5f), 1.25, {glm::vec3(0.9, 0.76, 0.46f), 0.5, 0.6, 0.2});
+    s.addSphere(glm::vec3(2.75, -0.5, 0), 0.8, {glm::vec3(0, 1, 0), 0.3, 0, 0.5});
+    s.addSphere(glm::vec3(0.5, -1, 0.2), 0.5, {glm::vec3(0.65, 0.77, 0.97f), 0, 1, 0.8});
+    s.addSphere(glm::vec3(-1.75, -0.75, -0.5f), 1, {glm::vec3(0.9, 0.76, 0.46f), 0.5, 0.6, 0.2});
 
     // Planes
     const float halfEdge = 4;
     s.addPlane(glm::vec3(0, 1, 0), halfEdge);
     s.addPlane(glm::vec3(0, -1, 0), halfEdge);
     s.addPlane(glm::vec3(0, 0, 1), halfEdge);
-    s.addPlane(glm::vec3(0, 0, -1), halfEdge, {glm::vec3(0), 0.6});
+    s.addPlane(glm::vec3(0, 0, -1), halfEdge);
     s.addPlane(glm::vec3(-1, 0, 0), halfEdge, {glm::vec3(1, 0, 0), 0.6});
     s.addPlane(glm::vec3(1, 0, 0), halfEdge, {glm::vec3(0, 1, 0), 0.6});
-
-
-    // std::vector<glm::vec3> v = {
-    //     {  0,  0,  1.75 },
-    //     {  1,  1,  0 },
-    //     {  1, -1,  0 },
-    //     { -1, -1,  0 },
-    //     { -1,  1,  0 },
-    //     {  0,  0, -1.75 },
-    // };
-
-    // std::vector<std::vector<int>> f = {
-    //     { 1, 2, 3 },
-    //     { 1, 3, 4 },
-    //     { 1, 4, 5 },
-    //     { 1, 5, 2 },
-    //     { 6, 5, 4 },
-    //     { 6, 4, 3 },
-    //     { 6, 3, 2 },
-    //     { 6, 2, 1 },
-    //     { 6, 1, 5 }
-    // };
 
 
     glm::vec3 v[] = {
@@ -106,8 +84,6 @@ static void createScene(Scene &s)
 
     // Triangles
     // s.addTriangle(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0.5), glm::vec3(0, 0, 1), {glm::vec3(0, 1, 1), 0.6});
-    // s.addTriangle(glm::vec3(1, 1, 0.2), glm::vec3(0, 0, 0), glm::vec3(0, 0, 1), {glm::vec3(0, 1, 1), 0.6});
-
 
 
     // for (int i = 0; i < 2; i++)

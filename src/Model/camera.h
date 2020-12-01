@@ -36,6 +36,7 @@ public:
     glm::vec3 rotation = glm::vec3();
     glm::vec3 position = glm::vec3();
     glm::vec4 viewPos = glm::vec4();
+    glm::mat4 rotM = glm::mat4(1.0f);
 
     float rotationSpeed = 1.0f;
     float movementSpeed = 1.0f;
@@ -104,7 +105,16 @@ public:
     void rotate(glm::vec3 delta)
     {
         this->rotation += delta;
-        updateViewMatrix();
+        rotM = glm::mat4(1.0f);
+
+        rotM = glm::rotate(rotM, glm::radians(rotation.x * (flipY ? -1.0f : 1.0f)), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotM = glm::rotate(rotM, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotM = glm::rotate(rotM, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        position = rotM * glm::vec4(0, 0, -4.0, 0.0);
+        // std::cout << rotation.x << ' ' << rotation.y << ' ' << rotation.z;
+        // std::cout << std::endl;
+        // updateViewMatrix();
     }
 
     void setTranslation(glm::vec3 translation)

@@ -31,12 +31,6 @@ float triangleIntersect(in Ray r, in Triangle tr)
     vec3 v2v0 = tr.v2 - tr.v0;
     vec3 rov0 = r.o - tr.v0;
 
-    // Cramer's rule for solcing p(t) = ro+t·rd = p(u,v) = vo + u·(v1-v0) + v·(v2-v1)
-    // float d = 1.0/determinant(mat3(v1v0, v2v0, -r.d ));
-    // float u =   d*determinant(mat3(rov0, v2v0, -r.d ));
-    // float v =   d*determinant(mat3(v1v0, rov0, -r.d ));
-    // float t =   d*determinant(mat3(v1v0, v2v0, rov0));
-
     vec3  n = cross(v1v0, v2v0);
     vec3  q = cross(rov0, r.d);
     float d = 1.0 / dot(r.d, n);
@@ -51,7 +45,6 @@ float triangleIntersect(in Ray r, in Triangle tr)
 }
 
 int intersect(in Ray r, inout float tRest)
-// int intersect(in Ray r, inout Path p)
 {
     int id = -1;
 

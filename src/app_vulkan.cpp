@@ -10,7 +10,6 @@ VulkanApp::VulkanApp(void (*setupCamera)(Camera &), void (*createScene)(Scene &)
 
     scene.ubo.lightPos = { 0, 3.8, 0 };
     scene.ubo.aspectRatio = (float)width / (float)height;
-    timerSpeed *= 0.8f;
 
     setupCamera(camera);
     createScene(scene);
@@ -579,10 +578,11 @@ void VulkanApp::prepareStorageBuffers()
 
 void VulkanApp::updateUniformBuffers()
 {
-    scene.ubo.lightPos.x = 0.0f + sin(glm::radians(timer * 360.0f)) * cos(glm::radians(timer * 360.0f)) * 2.0f;
-    scene.ubo.lightPos.y = 0.0f + sin(glm::radians(timer * 360.0f)) * 2.0f;
-    scene.ubo.lightPos.z = 0.0f + cos(glm::radians(timer * 360.0f)) * 2.0f;
-    scene.ubo.camera.pos = camera.position * -1.0f;
+    scene.ubo.lightPos.x = 0.0f + sin(glm::radians(timer * 360.0f)) * cos(glm::radians(timer * 360.0f)) * 3.0f;
+    scene.ubo.lightPos.y = 0.0f + sin(glm::radians(timer * 360.0f)) * 3.0f;
+    scene.ubo.lightPos.z = 0.0f + cos(glm::radians(timer * 360.0f)) * 3.0f;
+    scene.ubo.pos = camera.position * -1.0f;
+    scene.ubo.rot = camera.rotM;
     
     // scene.ubo.n = scene.spheres.size();
 

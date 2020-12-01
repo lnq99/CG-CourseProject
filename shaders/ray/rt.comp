@@ -1,7 +1,6 @@
 #version 450
 
 #include "rt_core/light.glsl"
-// #include "rt_core/utils.glsl"
 
 
 layout (local_size_x = 16, local_size_y = 16) in;
@@ -33,11 +32,11 @@ void main()
 {
     ivec2 dim = imageSize(IMG);
 
-    vec2 uv = vec2(gl_GlobalInvocationID.xy) / dim * 4 - 2;
+    vec2 uv = vec2(gl_GlobalInvocationID.xy) / dim * 2 - 1;
 
     Ray r = Ray(
         ubo.camera.pos,
-        normalize(vec3(uv * vec2(ubo.aspectRatio, 1), -2))
+        normalize(vec3(ubo.rotMat * vec4(uv * vec2(ubo.aspectRatio, 1), 0, 0)) - normalize(ubo.camera.pos))
     );
 
     vec3 color = pixelColor(r);

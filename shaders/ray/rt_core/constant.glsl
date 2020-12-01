@@ -6,7 +6,7 @@
 #define MAX_LEN 1000.0
 #define N_SAMPLE 16
 
-#define RAYBOUNCES 3
+#define RAYBOUNCES 2
 #define REFLECTIONS true
 #define REFLECTIONSTRENGTH 0.2
 #define REFLECTIONFALLOFF 0.3
