@@ -6,13 +6,6 @@ struct Ray
     vec3 d;
 };
 
-struct Camera
-{
-    vec3 pos;
-    // vec3 lookat;
-    // float fov;
-};
-
 
 struct Material
 {
@@ -49,8 +42,9 @@ struct Triangle
 layout (binding = 1) uniform UBO
 {
     vec3 lightPos;
+    float ambient;
+    vec3 pos;
     float aspectRatio;
-    Camera camera;
     mat4 rotMat;
 } ubo;
 

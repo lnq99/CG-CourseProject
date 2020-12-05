@@ -1,7 +1,5 @@
 #pragma one
 
-#include "light.h"
-// #include "camera.h"
 #include "entity.h"
 
 #include <vector>
@@ -10,11 +8,10 @@
 struct SceneUBO
 {
     glm::vec3 lightPos;
-    float aspectRatio;
+    float ambient = 0.2;
     glm::vec3 pos = glm::vec3(0.0f, 0.0f, 4.0f);
-    uint pad;
+    float aspectRatio;
     glm::mat4 rot;
-    // uint n;
 };
 
 

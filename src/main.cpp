@@ -4,11 +4,9 @@
 
 static void setupCamera(Camera &c)
 {
-    // c.setPerspective(45.0f, (float)width / (float)height, 0, 256);
-    c.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-    c.setTranslation(glm::vec3(0.0f, 0.0f, -4.0f));
-    c.rotationSpeed = 0.1f;
-    c.movementSpeed = 2.f;
+    c.rotation = glm::vec3(0, 0, 0);
+    c.position = glm::vec3(0, 0, -4);
+    c.rotationSpeed = 0.1;
 }
 
 static void createScene(Scene &s)
@@ -22,8 +20,8 @@ static void createScene(Scene &s)
 
     // Spheres
     s.addSphere(glm::vec3(2.75, -0.5, 0), 0.8, {glm::vec3(0, 1, 0), 0.3, 0, 0.5});
-    s.addSphere(glm::vec3(0.5, -1, 0.2), 0.5, {glm::vec3(0.65, 0.77, 0.97f), 0, 1, 0.8});
-    s.addSphere(glm::vec3(-1.75, -0.75, -0.5f), 1, {glm::vec3(0.9, 0.76, 0.46f), 0.5, 0.6, 0.2});
+    s.addSphere(glm::vec3(0.5, -1, 0.2), 0.5, {glm::vec3(0.65, 0.77, 0.97), 0, 1, 0.8});
+    s.addSphere(glm::vec3(-1.75, -0.75, -0.5), 1, {glm::vec3(0.9, 0.76, 0.46), 0.5, 0.6, 0.2});
 
     // Planes
     const float halfEdge = 4;
@@ -81,17 +79,6 @@ static void createScene(Scene &s)
     for (auto i : f) {
         s.addTriangle(v[i[0]], v[i[1]], v[i[2]]);
     }
-
-    // Triangles
-    // s.addTriangle(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0.5), glm::vec3(0, 0, 1), {glm::vec3(0, 1, 1), 0.6});
-
-
-    // for (int i = 0; i < 2; i++)
-    //     s.addSphere(
-    //         glm::vec3((rand() % 10 / 5.f - 1) * 4, (rand() % 10 / 5.f - 1) * 3, (rand() % 10 / 5.f - 1) * 1.2),
-    //         (rand() % 7 + 2) / 6.f,
-    //         {glm::vec3((rand() % 10) / 10.f, 0.2f, (rand() % 10) / 10.f),
-    //         (rand() % 10) / 10.f});
 }
 
 VulkanApp App(setupCamera, createScene);

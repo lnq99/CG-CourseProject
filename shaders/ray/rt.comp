@@ -35,8 +35,8 @@ void main()
     vec2 uv = vec2(gl_GlobalInvocationID.xy) / dim * 2 - 1;
 
     Ray r = Ray(
-        ubo.camera.pos,
-        normalize(vec3(ubo.rotMat * vec4(uv * vec2(ubo.aspectRatio, 1), 0, 0)) - normalize(ubo.camera.pos))
+        ubo.pos,
+        normalize(vec3(ubo.rotMat * vec4(uv * vec2(ubo.aspectRatio, 1), 0, 0)) - normalize(ubo.pos))
     );
 
     vec3 color = pixelColor(r);

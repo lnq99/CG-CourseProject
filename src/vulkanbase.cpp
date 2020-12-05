@@ -1,4 +1,3 @@
-//file:///home/ql/Desktop/CG/src/vulkanbase.cpp {"mtime":1598641936447,"ctime":1597003025931,"size":36917,"etag":"35jh469cc17cr","orphaned":false}
 #include "vulkanbase.h"
 
 std::vector<const char*> VulkanBase::args;
@@ -136,11 +135,7 @@ void VulkanBase::nextFrame()
     auto tEnd = std::chrono::high_resolution_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
     frameTimer = (float)tDiff / 1000.0f;
-    camera.update(frameTimer);
-    if (camera.moving())
-    {
-        viewUpdated = true;
-    }
+
     // Convert to clamped timer value
     if (!paused)
     {
@@ -202,7 +197,6 @@ void VulkanBase::updateOverlay()
 
     io.MousePos = ImVec2(mousePos.x, mousePos.y);
     io.MouseDown[0] = mouseButtons.left;
-    io.MouseDown[1] = mouseButtons.right;
 
     ImGui::NewFrame();
 
@@ -571,74 +565,20 @@ void VulkanBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             break;
         }
 
-        if (camera.type == Camera::firstperson)
-        {
-            switch (wParam)
-            {
-            case KEY_W:
-                camera.keys.up = true;
-                break;
-            case KEY_S:
-                camera.keys.down = true;
-                break;
-            case KEY_A:
-                camera.keys.left = true;
-                break;
-            case KEY_D:
-                camera.keys.right = true;
-                break;
-            }
-        }
-
         keyPressed((uint32_t)wParam);
         break;
     case WM_KEYUP:
-        if (camera.type == Camera::firstperson)
-        {
-            switch (wParam)
-            {
-            case KEY_W:
-                camera.keys.up = false;
-                break;
-            case KEY_S:
-                camera.keys.down = false;
-                break;
-            case KEY_A:
-                camera.keys.left = false;
-                break;
-            case KEY_D:
-                camera.keys.right = false;
-                break;
-            }
-        }
         break;
     case WM_LBUTTONDOWN:
         mousePos = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
         mouseButtons.left = true;
         break;
-    case WM_RBUTTONDOWN:
-        mousePos = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
-        mouseButtons.right = true;
-        break;
-    case WM_MBUTTONDOWN:
-        mousePos = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
-        mouseButtons.middle = true;
-        break;
     case WM_LBUTTONUP:
         mouseButtons.left = false;
-        break;
-    case WM_RBUTTONUP:
-        mouseButtons.right = false;
-        break;
-    case WM_MBUTTONUP:
-        mouseButtons.middle = false;
         break;
     case WM_MOUSEWHEEL:
     {
         short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-        camera.translate(glm::vec3(0.0f, 0.0f, (float)wheelDelta * 0.005f));
-        viewUpdated = true;
-
         ImGui::GetIO().MouseWheel += (float)wheelDelta;
         break;
     }
@@ -800,11 +740,6 @@ void VulkanBase::handleEvent(const xcb_generic_event_t *event)
         xcb_button_press_event_t *press = (xcb_button_press_event_t *)event;
         if (press->detail == XCB_BUTTON_INDEX_1)
             mouseButtons.left = true;
-        if (press->detail == XCB_BUTTON_INDEX_2)
-            mouseButtons.middle = true;
-        if (press->detail == XCB_BUTTON_INDEX_3)
-            mouseButtons.right = true;
-
         if (press->detail == XCB_BUTTON_INDEX_4)
             ImGui::GetIO().MouseWheel += 1;
         if (press->detail == XCB_BUTTON_INDEX_5)
@@ -816,10 +751,6 @@ void VulkanBase::handleEvent(const xcb_generic_event_t *event)
         xcb_button_press_event_t *press = (xcb_button_press_event_t *)event;
         if (press->detail == XCB_BUTTON_INDEX_1)
             mouseButtons.left = false;
-        if (press->detail == XCB_BUTTON_INDEX_2)
-            mouseButtons.middle = false;
-        if (press->detail == XCB_BUTTON_INDEX_3)
-            mouseButtons.right = false;
     }
     break;
     case XCB_KEY_PRESS:
@@ -827,18 +758,6 @@ void VulkanBase::handleEvent(const xcb_generic_event_t *event)
         const xcb_key_release_event_t *keyEvent = (const xcb_key_release_event_t *)event;
         switch (keyEvent->detail)
         {
-            case KEY_W:
-                camera.keys.up = true;
-                break;
-            case KEY_S:
-                camera.keys.down = true;
-                break;
-            case KEY_A:
-                camera.keys.left = true;
-                break;
-            case KEY_D:
-                camera.keys.right = true;
-                break;
             case KEY_P:
                 paused = !paused;
                 break;
@@ -850,18 +769,6 @@ void VulkanBase::handleEvent(const xcb_generic_event_t *event)
         const xcb_key_release_event_t *keyEvent = (const xcb_key_release_event_t *)event;
         switch (keyEvent->detail)
         {
-            case KEY_W:
-                camera.keys.up = false;
-                break;
-            case KEY_S:
-                camera.keys.down = false;
-                break;
-            case KEY_A:
-                camera.keys.left = false;
-                break;
-            case KEY_D:
-                camera.keys.right = false;
-                break;
             case KEY_ESCAPE:
                 quit = true;
                 break;
@@ -1094,10 +1001,6 @@ void VulkanBase::windowResize()
 
     vkDeviceWaitIdle(device);
 
-    if ((width > 0.0f) && (height > 0.0f)) {
-        camera.updateAspectRatio((float)width / (float)height);
-    }
-
     // Notify derived class
     windowResized();
     viewChanged();
@@ -1126,14 +1029,7 @@ void VulkanBase::handleMouseMove(int32_t x, int32_t y)
         camera.rotate(glm::vec3(dy * camera.rotationSpeed, dx * camera.rotationSpeed, 0.0f));
         viewUpdated = true;
     }
-    if (mouseButtons.right) {
-        camera.translate(glm::vec3(-0.0f, 0.0f, dy * .005f));
-        viewUpdated = true;
-    }
-    if (mouseButtons.middle) {
-        camera.translate(glm::vec3(-dx * 0.01f, -dy * 0.01f, 0.0f));
-        viewUpdated = true;
-    }
+
     mousePos = glm::vec2((float)x, (float)y);
 }
 

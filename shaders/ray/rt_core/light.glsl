@@ -3,12 +3,12 @@
 
 float lightDiffuse(vec3 normal, vec3 lightDir)
 {
-    return clamp(dot(normal, lightDir), 0.2, 0.8);
+    return clamp(dot(normal, lightDir), 0, 1);
 }
 
 float lightSpecular(vec3 normal, vec3 lightDir, float specularFactor)
 {
-    vec3 viewVec = normalize(ubo.camera.pos);
+    vec3 viewVec = normalize(ubo.pos);
     vec3 halfVec = normalize(lightDir + viewVec);
     return specularFactor * pow(clamp(dot(normal, halfVec), 0, 1), 32);
 }
