@@ -43,10 +43,12 @@ layout (binding = 1) uniform UBO
 {
     vec3 lightPos;
     float ambient;
-    vec3 pos;
+    vec3 cameraPos;
     float aspectRatio;
     mat4 rotMat;
     Material material;
+    vec3 lightColor;
+    float lightRadius;
 } ubo;
 
 layout (std140, binding = 2) buffer Spheres

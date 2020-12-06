@@ -9,6 +9,9 @@ VulkanApp::VulkanApp(void (*setupCamera)(Camera &), void (*createScene)(Scene &)
     title = "Compute shader - ray tracing";
 
     scene.ubo.lightPos = { 0, 3.8, 0 };
+    scene.ubo.lightColor = glm::vec3(3);
+    scene.ubo.lightRadius = 0.05;
+    scene.ubo.ambient = 1;
     scene.ubo.aspectRatio = (float)width / (float)height;
 
     setupCamera(camera);
@@ -579,9 +582,9 @@ void VulkanApp::prepareStorageBuffers()
 void VulkanApp::updateUniformBuffers()
 {
     scene.ubo.lightPos.x = 0.0f + sin(glm::radians(timer * 360.0f)) * cos(glm::radians(timer * 360.0f)) * 3.0f;
-    scene.ubo.lightPos.y = 0.0f + sin(glm::radians(timer * 360.0f)) * 3.0f;
+    scene.ubo.lightPos.y = 0.0f + sin(glm::radians(timer * 360.0f)) * 2.8f;
     scene.ubo.lightPos.z = 0.0f + cos(glm::radians(timer * 360.0f)) * 3.0f;
-    scene.ubo.pos = camera.position * -1.0f;
+    scene.ubo.cameraPos = camera.position * -1.0f;
     scene.ubo.rot = camera.rotM;
 
     VK_CHECK_RESULT(compute.uniformBuffer.map());

@@ -8,26 +8,29 @@ float lightDiffuse(vec3 normal, vec3 lightDir)
 
 float lightSpecular(vec3 normal, vec3 lightDir, float shininess)
 {
-    vec3 viewVec = normalize(ubo.pos);
+    vec3 viewVec = normalize(ubo.cameraPos);
     vec3 halfVec = normalize(lightDir + viewVec);
     return pow(max(dot(normal, halfVec), 0), shininess);
 }
 
 
-void calcDiffuseSpecular(inout vec2 df, vec3 normal, vec3 pos, vec3 lightVec, float shininess)
+void calcDiffuseSpecular(inout vec2 df, vec3 normal, vec3 pos, vec3 lightDir, float shininess)
 {
-    Ray shadowRay = Ray(pos, lightVec);
+    Ray shadowRay = Ray(pos, lightDir);
 
     if (intersect(shadowRay) == -2)
     {
-        df[0] = lightDiffuse(normal, lightVec);
-        df[1] = lightSpecular(normal, lightVec, shininess);
+        df[0] = lightDiffuse(normal, lightDir);
+        df[1] = lightSpecular(normal, lightDir, shininess);
     }
 }
 
-vec3 calcColor(vec2 df, Material m)
+vec3 calcColor(vec2 df, Material m, vec3 lightVec)
 {
-    return (ubo.ambient * m.ka + df[0] * m.kd + df[1] * m.ks) * m.color;
+    float r2 = length(lightVec);
+    r2 = r2 * r2;
+    return  m.color * min((ubo.ambient * m.ka +
+        (df[0] * m.kd + df[1] * m.ks) / r2 * ubo.lightColor), 1);
 }
 
 
@@ -40,9 +43,10 @@ vec3 getColor(inout Ray r, inout float k, inout float ior)
     Material m;
 
     r.o = r.o + t * r.d;
-    vec3 lightVec = normalize(ubo.lightPos - r.o);
+    vec3 lightVec = ubo.lightPos - r.o;
+    vec3 lightDir = normalize(lightVec);
 
-    if (id == -2) return vec3(1);
+    if (id == -2) return ubo.lightColor;
 
     if (id < spheres.length())
     {
@@ -83,9 +87,9 @@ vec3 getColor(inout Ray r, inout float k, inout float ior)
 
     vec2 df = vec2(0);
 
-    calcDiffuseSpecular(df, normal, r.o, lightVec, m.shininess);
+    calcDiffuseSpecular(df, normal, r.o, lightDir, m.shininess);
 
-    color = calcColor(df, m);
+    color = calcColor(df, m, lightVec);
 
     k *= m.k;
 

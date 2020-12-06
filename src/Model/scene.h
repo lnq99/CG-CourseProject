@@ -8,11 +8,13 @@
 struct SceneUBO
 {
     glm::vec3 lightPos;
-    float ambient = 1.2;
-    glm::vec3 pos;
+    float ambient = 1;
+    glm::vec3 cameraPos;
     float aspectRatio;
     glm::mat4 rot;
     Material material;
+    glm::vec3 lightColor;
+    float lightRadius;
 };
 
 
