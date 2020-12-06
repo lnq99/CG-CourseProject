@@ -583,8 +583,6 @@ void VulkanApp::updateUniformBuffers()
     scene.ubo.lightPos.z = 0.0f + cos(glm::radians(timer * 360.0f)) * 3.0f;
     scene.ubo.pos = camera.position * -1.0f;
     scene.ubo.rot = camera.rotM;
-    
-    // scene.ubo.n = scene.spheres.size();
 
     VK_CHECK_RESULT(compute.uniformBuffer.map());
     memcpy(compute.uniformBuffer.mapped, &scene.ubo, sizeof(scene.ubo));

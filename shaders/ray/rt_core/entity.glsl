@@ -6,15 +6,16 @@ struct Ray
     vec3 d;
 };
 
-
 struct Material
 {
-    vec3 baseColor;
-    float metallic;
-    float specular;
-    float roughness;
-    float trans;        // transmission
-    float transRough;   // transmission roughness
+    vec3 ambient;
+    float ka;
+    vec3 diffuse;
+    float kd;
+    vec3 specular;
+    float ks;
+    float shininess;
+    float reflect;
 };
 
 struct Sphere
@@ -46,6 +47,7 @@ layout (binding = 1) uniform UBO
     vec3 pos;
     float aspectRatio;
     mat4 rotMat;
+    Material material;
 } ubo;
 
 layout (std140, binding = 2) buffer Spheres

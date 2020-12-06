@@ -10,17 +10,16 @@ layout (binding = 0, rgba8) uniform writeonly image2D IMG;
 
 vec3 pixelColor(inout Ray r)
 {
-    vec3 color = getColor(r);
+    float kr = 1;
+    vec3 color = getColor(r, kr);
 
-    // Reflection
     if (REFLECTIONS)
     {
-        float reflectionStrength = REFLECTIONSTRENGTH;
         for (int i = 0; i < RAYBOUNCES; i++)
         {
-            vec3 reflectionColor = getColor(r);
-            color = (1.0 - reflectionStrength) * color + reflectionStrength * mix(reflectionColor, color, 1.0 - reflectionStrength);
-            reflectionStrength *= REFLECTIONFALLOFF;
+            float reflectionStrength = kr;
+            vec3 reflectionColor = getColor(r, kr);
+            color = mix(color, mix(reflectionColor, color, 1.0 - reflectionStrength), reflectionStrength);
         }
     }
 

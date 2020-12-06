@@ -1,5 +1,12 @@
 #include "scene.h"
 
+const Material Scene::defaultMaterial = {
+    glm::vec3(1), .1,
+    glm::vec3(1), .7,
+    glm::vec3(1), 0
+};
+
+
 Scene::Scene()
 {
 }

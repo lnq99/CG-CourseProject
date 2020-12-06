@@ -1,8 +1,5 @@
-#define EPSILON 0.0001
-#define MAX_LEN 1000.0
+#define EPSILON .001
+#define MAX_LEN 100.
 #define RAYBOUNCES 2
 #define REFLECTIONS true
 #define REFRACTIONS true
-
-#define REFLECTIONSTRENGTH 0.2
-#define REFLECTIONFALLOFF 0.3

@@ -6,9 +6,11 @@ float sphereIntersect(in Ray r, in Sphere s)
     float b = 2. * dot(oc, r.d);
     float c = dot(oc, oc) - s.radius * s.radius;
     float h = b * b - 4 * c;
-    if (h < 0)
-        return -1;
+
+    if (h < 0) return -1;
+
     float t = (-b - sqrt(h)) / 2;
+
     return t;
 }
 
@@ -16,11 +18,9 @@ float planeIntersect(in Ray r, in Plane p)
 {
     float d = dot(r.d, p.normal);
 
-    if (d == 0) return 0;
+    if (d == 0) return -1;
 
     float t = -(p.distance + dot(r.o, p.normal)) / d;
-
-    if (t < 0) return 0;
 
     return t;
 }
@@ -33,13 +33,13 @@ float triangleIntersect(in Ray r, in Triangle tr)
 
     vec3  n = cross(v1v0, v2v0);
     vec3  q = cross(rov0, r.d);
-    float d = 1.0 / dot(r.d, n);
+    float d = 1 / dot(r.d, n);
     float u = d * dot(-q, v2v0);
     float v = d * dot( q, v1v0);
     float t = d * dot(-n, rov0);
 
-    if (u < 0.0 || v < 0.0 || (u+v) > 1.0)
-        t = -1.0;
+    if (u < 0 || v < 0 || (u+v) > 1)
+        t = -1;
 
     return t;
 }
@@ -61,7 +61,7 @@ int intersect(in Ray r, inout float tRest)
 
     t = sphereIntersect(r, light);
 
-    if (t > EPSILON && t < tMin)
+    if (t != -1)
     {
         id = -2;
         tMin = t;
