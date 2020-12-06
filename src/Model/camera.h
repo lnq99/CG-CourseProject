@@ -19,7 +19,7 @@ public:
     {
         rotation += delta;
         rotM = glm::mat4(1);
-        rotM = glm::rotate(rotM, glm::radians(rotation.x * (flipY ? -1 : 1)), glm::vec3(1, 0, 0));
+        rotM = glm::rotate(rotM, glm::radians(rotation.x), glm::vec3(1, 0, 0));
         rotM = glm::rotate(rotM, glm::radians(rotation.y), glm::vec3(0, 1, 0));
         rotM = glm::rotate(rotM, glm::radians(rotation.z), glm::vec3(0, 0, 1));
 

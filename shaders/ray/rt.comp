@@ -14,14 +14,12 @@ vec3 pixelColor(inout Ray r)
     float ior = 1;
     vec3 color = getColor(r, k, ior);
 
-    if (REFLECTIONS)
+    float kRest = k;
+    for (int i = 0; kRest > EPSILON && i < RAYBOUNCES; i++)
     {
-        for (int i = 0; i < RAYBOUNCES; i++)
-        {
-            float reflectionStrength = k;
-            vec3 reflectionColor = getColor(r, k, ior);
-            color = mix(color, mix(reflectionColor, color, 1.0 - reflectionStrength), reflectionStrength);
-        }
+        vec3 cumulativeColor = getColor(r, k, ior);
+        color = mix(color, mix(cumulativeColor, color, 1.0 - kRest), kRest);
+        kRest = k;
     }
 
     return color;

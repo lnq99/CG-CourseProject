@@ -27,9 +27,7 @@ void calcDiffuseSpecular(inout vec2 df, vec3 normal, vec3 pos, vec3 lightVec, fl
 
 vec3 calcColor(vec2 df, Material m)
 {
-    return ubo.ambient * m.ambient * m.ka
-            + df[0] * m.diffuse * m.kd
-            + df[1] * m.specular * m.ks;
+    return (ubo.ambient * m.ka + df[0] * m.kd + df[1] * m.ks) * m.color;
 }
 
 
@@ -37,22 +35,18 @@ vec3 getColor(inout Ray r, inout float k, inout float ior)
 {
     float t;
     uint id = intersect(r, t);
-
     vec3 color = vec3(0);
     vec3 normal;
-    vec3 pos = r.o + t * r.d;
-    vec3 lightVec = normalize(ubo.lightPos - pos);
-
-    vec2 df = vec2(0);
     Material m;
+
+    r.o = r.o + t * r.d;
+    vec3 lightVec = normalize(ubo.lightPos - r.o);
 
     if (id == -2) return vec3(1);
 
-    // if (id == -1) return vec3(0);
-
     if (id < spheres.length())
     {
-        normal = sphereNormal(pos, spheres[id]);
+        normal = sphereNormal(r.o, spheres[id]);
         m = spheres[id].material;
     }
     else if ((id -= spheres.length()) < planes.length())
@@ -68,33 +62,33 @@ vec3 getColor(inout Ray r, inout float k, inout float ior)
 
     if (m.ior != 0)
     {
-        r.o = pos;
-        vec3 d;
         if (dot(r.d, normal) > 0) normal = -normal;
         if (m.ior == ior) m.ior = 1;
-        d = refract(r.d, normal, ior / m.ior);
+        vec3 d = refract(r.d, normal, ior / m.ior);
 
         if (length(d) != 0)
         {
             r.d = d;
             k *= 0.98;
+            color = m.color * 0.02;
         }
         else
         {
             r.d = reflect(r.d, normal);
-            k *= 0.9;
+            k *= m.k;
         }
         ior = m.ior;
         return color;
     }
 
-    calcDiffuseSpecular(df, normal, pos, lightVec, m.shininess);
+    vec2 df = vec2(0);
+
+    calcDiffuseSpecular(df, normal, r.o, lightVec, m.shininess);
 
     color = calcColor(df, m);
 
     k *= m.k;
 
-    r.o = pos;
     r.d = reflect(r.d, normal);
 
     return color;

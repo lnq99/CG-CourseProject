@@ -6,16 +6,14 @@
 
 struct Material
 {
-    glm::vec3 ambient;
+    glm::vec3 color;
     float ka;
-    glm::vec3 diffuse;
     float kd;
-    glm::vec3 specular;
     float ks;
     float shininess = 2;
     float k = 0.2;
     float ior = 0;
-    float _p;
+    glm::vec3 _p;
 };
 
 struct Surface
@@ -41,8 +39,8 @@ public:
         add("diffuse", { .1, .7, 0, 1, 0 });
         add("minor", { 0, 0, 0, 0, .95 });
         add("plastic", { .1, .7, 0, 2, .1 });
-        add("glass", { .2, .2, .2, 2, .7, 1.52 });
-        add("diamond", { .1, .1, .1, 0, .9, 2 });
+        add("glass", { .2, .2, .2, 2, .8, 1.52 });
+        add("diamond", { .1, .1, .1, 0, .9, 2.418 });
     }
 
     void add(std::string name, Surface sur)
@@ -55,14 +53,9 @@ public:
         return data[name];
     }
 
-    Material get(std::string name, glm::vec3 a, glm::vec3 d, glm::vec3 s)
-    {
-        Surface sur = getSurface(name);
-        return { a, sur.ka, d, sur.kd, s, sur.ks, sur.shininess, sur.k, sur.ior };
-    }
-
     Material get(std::string name, glm::vec3 color = glm::vec3(1))
     {
-        return get(name, color, color, color);
+        Surface sur = getSurface(name);
+        return { color, sur.ka, sur.kd, sur.ks, sur.shininess, sur.k, sur.ior };
     }
 };

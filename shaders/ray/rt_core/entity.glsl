@@ -8,11 +8,9 @@ struct Ray
 
 struct Material
 {
-    vec3 ambient;
+    vec3 color;
     float ka;
-    vec3 diffuse;
     float kd;
-    vec3 specular;
     float ks;
     float shininess;
     float k;
