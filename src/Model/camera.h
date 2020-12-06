@@ -7,15 +7,15 @@
 class Camera
 {
 public:
-    float radius = 4;
+    float radius = 3.8;
     glm::vec3 rotation = glm::vec3(0);
-    glm::vec3 position = glm::vec3();
+    glm::vec3 position;
     glm::mat4 rotM = glm::mat4(1);
 
     float rotationSpeed = 0.1;
     bool flipY = false;
 
-    void rotate(glm::vec3 delta)
+    void rotate(glm::vec3 delta = {0,0,0})
     {
         rotation += delta;
         rotM = glm::mat4(1);

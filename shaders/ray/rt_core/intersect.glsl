@@ -44,11 +44,11 @@ float triangleIntersect(in Ray r, in Triangle tr)
     return t;
 }
 
-int intersect(in Ray r, inout float tRest)
+int intersect(in Ray r, out float tRest)
 {
     int id = -1;
 
-    float tMin = tRest;
+    float tMin = MAX_LEN;
     float t;
 
     Material m;
@@ -101,6 +101,48 @@ int intersect(in Ray r, inout float tRest)
     }
 
     tRest = tMin;
+
+    return id;
+}
+
+// Shadow ray
+int intersect(in Ray r)
+{
+    float t;
+    Material m;
+
+    Sphere light = Sphere(
+        m,
+        ubo.lightPos,
+        0.05
+    );
+
+    float tMin = sphereIntersect(r, light);
+    int id = -2;
+
+    for (int i = 0; i < spheres.length(); i++)
+    {
+        t = sphereIntersect(r, spheres[i]);
+
+        if (t > EPSILON && t < tMin)
+            return 0;
+    }
+
+    for (int i = 0; i < planes.length(); i++)
+    {
+        t = planeIntersect(r, planes[i]);
+
+        if (t > EPSILON && t < tMin)
+            return 0;
+    }
+
+    for (int i = 0; i < triangles.length(); i++)
+    {
+        t = triangleIntersect(r, triangles[i]);
+
+        if (t > EPSILON && t < tMin)
+            return 0;
+    }
 
     return id;
 }

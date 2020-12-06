@@ -4,20 +4,21 @@
 
 static void setupCamera(Camera &c)
 {
-    c.rotation = glm::vec3(0, 0, 0);
-    c.position = glm::vec3(0, 0, -4);
     c.rotationSpeed = 0.1;
+    c.rotate();
 }
 
 static void createScene(Scene &s)
 {
     MaterialStore materials;
-    s.ubo.material = materials.get("metal", {1, 1, 0});
+    // s.ubo.material = materials.get("metal", {1, 1, 0});
+    s.ubo.material = materials.get("glass", {1, 1, 1});
 
     // Spheres
-    s.addSphere(glm::vec3(2.75, -0.5, 0), 0.8, materials.get("plastic", glm::vec3(0, 1, 0)));
-    s.addSphere(glm::vec3(0.5, -1, 0.2), 0.5, materials.get("shiny", glm::vec3(0.65, 0.77, 0.97)));
+    s.addSphere(glm::vec3(2.75, -0.5, 0), 0.6, materials.get("plastic", glm::vec3(0.3, 0.6, 0.9)));
+    s.addSphere(glm::vec3(0.5, -1, 0.2), 0.5, materials.get("shiny", glm::vec3(0.6, 0.7, 1)));
     s.addSphere(glm::vec3(-1.75, -0.75, -0.5), 1, materials.get("metal", glm::vec3(0.9, 0.76, 0.46)));
+    s.addSphere(glm::vec3(-0.6, -1.5, 0.7), 0.5, materials.get("glass", {1, 1, 1}));
 
     // Planes
     const float halfEdge = 4;

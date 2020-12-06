@@ -15,7 +15,8 @@ struct Material
     vec3 specular;
     float ks;
     float shininess;
-    float reflect;
+    float k;
+    float ior;
 };
 
 struct Sphere
@@ -52,17 +53,17 @@ layout (binding = 1) uniform UBO
 
 layout (std140, binding = 2) buffer Spheres
 {
-    Sphere spheres[ ];
+    Sphere spheres[];
 };
 
 layout (std140, binding = 3) buffer Planes
 {
-    Plane planes[ ];
+    Plane planes[];
 };
 
 layout (std430, binding = 4) buffer Triangles
 {
-    Triangle triangles[ ];
+    Triangle triangles[];
 };
 
 vec3 sphereNormal(in vec3 pos, in Sphere sphere)

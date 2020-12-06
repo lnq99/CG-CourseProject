@@ -14,19 +14,15 @@ float lightSpecular(vec3 normal, vec3 lightDir, float shininess)
 }
 
 
-vec2 calcDiffuseSpecular(vec3 normal, vec3 pos, vec3 lightVec, float shininess)
+void calcDiffuseSpecular(inout vec2 df, vec3 normal, vec3 pos, vec3 lightVec, float shininess)
 {
     Ray shadowRay = Ray(pos, lightVec);
-    vec2 df = vec2(0);
-    float t = MAX_LEN;
 
-    if (intersect(shadowRay, t) == -2)
+    if (intersect(shadowRay) == -2)
     {
         df[0] = lightDiffuse(normal, lightVec);
         df[1] = lightSpecular(normal, lightVec, shininess);
     }
-
-    return df;
 }
 
 vec3 calcColor(vec2 df, Material m)
@@ -37,25 +33,22 @@ vec3 calcColor(vec2 df, Material m)
 }
 
 
-vec3 getColor(inout Ray r, inout float kreflect)
+vec3 getColor(inout Ray r, inout float k, inout float ior)
 {
-    vec3 color = vec3(0);
-
-    float t = MAX_LEN;
-
+    float t;
     uint id = intersect(r, t);
 
+    vec3 color = vec3(0);
     vec3 normal;
     vec3 pos = r.o + t * r.d;
     vec3 lightVec = normalize(ubo.lightPos - pos);
 
     vec2 df = vec2(0);
-
     Material m;
 
-    if (id == -2) return vec3(2);
+    if (id == -2) return vec3(1);
 
-    if (id == -1) return vec3(0);
+    // if (id == -1) return vec3(0);
 
     if (id < spheres.length())
     {
@@ -73,11 +66,33 @@ vec3 getColor(inout Ray r, inout float kreflect)
         m = ubo.material;
     }
 
-    df = calcDiffuseSpecular(normal, pos, lightVec, m.shininess);
+    if (m.ior != 0)
+    {
+        r.o = pos;
+        vec3 d;
+        if (dot(r.d, normal) > 0) normal = -normal;
+        if (m.ior == ior) m.ior = 1;
+        d = refract(r.d, normal, ior / m.ior);
+
+        if (length(d) != 0)
+        {
+            r.d = d;
+            k *= 0.98;
+        }
+        else
+        {
+            r.d = reflect(r.d, normal);
+            k *= 0.9;
+        }
+        ior = m.ior;
+        return color;
+    }
+
+    calcDiffuseSpecular(df, normal, pos, lightVec, m.shininess);
 
     color = calcColor(df, m);
 
-    kreflect *= m.reflect;
+    k *= m.k;
 
     r.o = pos;
     r.d = reflect(r.d, normal);
