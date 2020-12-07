@@ -29,8 +29,8 @@ void VulkanApp::OnUpdateUIOverlay()
         if (ImGui::TreeNodeEx("Point Light", ImGuiTreeNodeFlags_DefaultOpen))
         {
             // ImGui::DragFloat3("Position", &scene.ubo.lightPos.x);
-            ImGui::DragFloat3("Color", &scene.ubo.lightColor.x, 0.2, 0, 20);
-            ImGui::SliderFloat("Ambient", &scene.ubo.ambient, 0, 4);
+            ImGui::SliderFloat3("Color", &scene.ubo.lightColor.x, 0, 25, "%.0f");
+            ImGui::SliderFloat("Ambient", &scene.ubo.ambient, 0, 4, "%.1f");
             ImGui::TreePop();
         }
 
@@ -38,9 +38,9 @@ void VulkanApp::OnUpdateUIOverlay()
 
         if (ImGui::TreeNodeEx("Camera", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::SliderFloat("Radius", &camera.radius, 1, 4);
+            ImGui::SliderFloat("Radius", &camera.radius, 1, 4, "%.1f");
             if (ImGui::IsItemEdited())
-                camera.rotate();
+                camera.updatePosition();
             ImGui::TreePop();
         }
 
@@ -103,8 +103,8 @@ void VulkanApp::OnUpdateUIOverlay()
             if (scene.selected < nSpheres)
             {
                 auto& sphere = scene.spheres[scene.selected];
-                ImGui::DragFloat3("Translate", &sphere.pos.x, 0.05);
-                ImGui::DragFloat("Radius", &sphere.radius, 0.02, 0.2, 1.5);
+                ImGui::DragFloat3("Translate", &sphere.pos.x, 0.05, -4, 4, "%.2f");
+                ImGui::DragFloat("Radius", &sphere.radius, 0.02, 0.2, 1.5, "%.2f");
             }
             // else if (scene.selected == n)
             // {

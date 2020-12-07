@@ -5,7 +5,7 @@
 static void setupCamera(Camera &c)
 {
     c.rotationSpeed = 0.1;
-    c.rotate();
+    c.updatePosition();
 }
 
 static void createScene(Scene &s)

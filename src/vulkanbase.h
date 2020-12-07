@@ -10,14 +10,9 @@
 #include <xcb/xcb.h>
 #endif
 
-#include <iostream>
 #include <chrono>
 #include <sys/stat.h>
 
-// #include <glm/glm.hpp>
-// #include <glm/gtc/matrix_transform.hpp>
-// #include <glm/gtc/matrix_inverse.hpp>
-// #include <glm/gtc/type_ptr.hpp>
 
 #include "vulkan/vulkan.h"
 
