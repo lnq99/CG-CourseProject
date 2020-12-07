@@ -9,7 +9,7 @@ VulkanApp::VulkanApp(void (*setupCamera)(Camera &), void (*createScene)(Scene &)
     title = "Compute shader - ray tracing";
 
     scene.ubo.lightPos = { 0, 3.8, 0 };
-    scene.ubo.lightColor = glm::vec3(3);
+    scene.ubo.lightColor = glm::vec3(5);
     scene.ubo.lightRadius = 0.05;
     scene.ubo.ambient = 1;
     scene.ubo.aspectRatio = (float)width / (float)height;
@@ -651,8 +651,6 @@ void VulkanApp::viewChanged()
 void VulkanApp::updateSphere()
 {
     auto nSphere = scene.spheres.size();
-    if (scene.selected < nSphere)
-        scene.spheres[scene.selected].pos = controller.translate;
 
     VK_CHECK_RESULT(compute.stagingBuffer1.map());
     memcpy(compute.stagingBuffer1.mapped, scene.spheres.data(), nSphere * sizeof(Sphere));

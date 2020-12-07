@@ -25,7 +25,8 @@ public:
     std::vector<Sphere> spheres;
     std::vector<Triangle> triangles;
     SceneUBO ubo;
-    uint32_t selected = -1;
+    MaterialStore store;
+    int selected = 0;
 
 public:
     static Scene& instance();

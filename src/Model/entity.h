@@ -8,23 +8,19 @@
 #include "material.h"
 
 
-// SSBO sphere declaration
-struct Sphere {                                    // Shader uses std140 layout (so we only use vec4 instead of vec3)
+struct Sphere {
     Material material;
     glm::vec3 pos;
     float radius;
 };
 
-// SSBO plane declaration
 struct Plane {
     Material material;
     glm::vec3 normal;
     float distance;
 };
 
-// SSBO triangle declaration
 struct Triangle {
-    // Material material;
     glm::vec3 v0;
     int32_t _pad0;
     glm::vec3 v1;

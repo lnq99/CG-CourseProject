@@ -10,23 +10,22 @@ static void setupCamera(Camera &c)
 
 static void createScene(Scene &s)
 {
-    MaterialStore materials;
-    s.ubo.material = materials.get("diamond", {1, 1, 1});
+    s.ubo.material = s.store.get("diamond", {1, 1, 1});
 
     // Spheres
-    s.addSphere(glm::vec3(2.5, -0.5, 0), 0.6, materials.get("plastic", glm::vec3(0.3, 0.6, 0.9)));
-    s.addSphere(glm::vec3(0.8, -1, 0.2), 0.5, materials.get("shiny", glm::vec3(0.6, 0.7, 1)));
-    s.addSphere(glm::vec3(-1.75, -0.75, -0.8), 1, materials.get("metal", glm::vec3(0.9, 0.76, 0.46)));
-    s.addSphere(glm::vec3(-0.5, -1.2, 0.5), 0.6, materials.get("glass", {1, 1, 1}));
+    s.addSphere(glm::vec3(2.5, -0.5, 0), 0.6, s.store.get("plastic", glm::vec3(0.3, 0.6, 0.9)));
+    s.addSphere(glm::vec3(0.8, -1, 0.2), 0.5, s.store.get("shiny", glm::vec3(0.6, 0.7, 1)));
+    s.addSphere(glm::vec3(-1.75, -0.75, -0.8), 1, s.store.get("metal", glm::vec3(0.9, 0.76, 0.46)));
+    s.addSphere(glm::vec3(-0.5, -1.2, 0.5), 0.6, s.store.get("glass", {1, 1, 1}));
 
     // Planes
     const float halfEdge = 4;
     s.addPlane(glm::vec3(0, 1, 0), halfEdge);
-    s.addPlane(glm::vec3(0, -1, 0), halfEdge, materials.get("diffuse"));
-    s.addPlane(glm::vec3(0, 0, 1), halfEdge, materials.get("minor"));
+    s.addPlane(glm::vec3(0, -1, 0), halfEdge, s.store.get("diffuse"));
+    s.addPlane(glm::vec3(0, 0, 1), halfEdge, s.store.get("minor"));
     s.addPlane(glm::vec3(0, 0, -1), halfEdge);
-    s.addPlane(glm::vec3(-1, 0, 0), halfEdge, materials.get("diffuse", {1, 0, 0}));
-    s.addPlane(glm::vec3(1, 0, 0), halfEdge, materials.get("diffuse", {0, 1, 0}));
+    s.addPlane(glm::vec3(-1, 0, 0), halfEdge, s.store.get("diffuse", {1, 0, 0}));
+    s.addPlane(glm::vec3(1, 0, 0), halfEdge, s.store.get("diffuse", {0, 1, 0}));
 
 
     glm::vec3 v[] = {

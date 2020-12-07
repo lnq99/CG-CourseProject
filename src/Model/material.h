@@ -39,8 +39,8 @@ public:
         add("diffuse", { .1, .7, 0, 1, 0 });
         add("minor", { 0, 0, 0, 0, .95 });
         add("plastic", { .1, .7, 0, 2, .1 });
-        add("glass", { .2, .2, .2, 2, .8, 1.52 });
-        add("diamond", { .1, .1, .1, 0, .9, 2.418 });
+        add("glass", { 0, 0, 0, 0, .8, 1.52 });
+        add("diamond", { 0, 0, 0, 0, .9, 2.418 });
     }
 
     void add(std::string name, Surface sur)

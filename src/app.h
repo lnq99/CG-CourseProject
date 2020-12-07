@@ -1,7 +1,5 @@
 #include "vulkanbase.h"
-
 #include "Model/scene.h"
-#include "control.h"
 
 #define VERTEX_BUFFER_BIND_ID 0
 
@@ -15,7 +13,6 @@ class VulkanApp : public VulkanBase
 {
 public:
     vks::Texture textureComputeTarget;
-    Controller controller;
     Scene& scene;
 
     // Resources for the graphics part of the example
