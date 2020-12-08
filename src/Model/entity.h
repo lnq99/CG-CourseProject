@@ -27,3 +27,11 @@ struct Triangle {
     glm::vec3 v2;
     int32_t _pad2;
 };
+
+struct AABB {
+    Material material;
+    glm::vec3 bMin;
+    int32_t _pad0;
+    glm::vec3 bMax;
+    int32_t _pad1;
+};

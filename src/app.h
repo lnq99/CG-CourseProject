@@ -7,6 +7,7 @@
 #define TEX_DIM_H 720
 
 #define N_SPHERE 6
+#define N_BOX    2
 
 
 class VulkanApp : public VulkanBase
@@ -30,10 +31,9 @@ public:
             vks::Buffer spheres;                        // (Shader) storage buffer object with scene spheres
             vks::Buffer planes;                        // (Shader) storage buffer object with scene planes
             vks::Buffer triangles;
+            vks::Buffer boxes;
         } storageBuffers;
-        vks::Buffer stagingBuffer1;
-        vks::Buffer stagingBuffer2;
-        vks::Buffer stagingBuffer3;
+        vks::Buffer stagingBuffer;
         vks::Buffer uniformBuffer;                    // Uniform buffer object containing scene data
         VkQueue queue;                                // Separate queue for compute commands (queue family may differ from the one used for graphics)
         VkCommandPool commandPool;                    // Use a separate command pool (queue family may differ from the one used for graphics)
@@ -59,7 +59,7 @@ public:
     // Setup and fill the compute shader storage buffers containing primitives for the raytraced scene
     void prepareStorageBuffers();
 
-    void updateSphere();
+    void updateScene();
 
     void setupDescriptorPool();
 

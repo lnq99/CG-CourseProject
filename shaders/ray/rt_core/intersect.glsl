@@ -25,6 +25,19 @@ float planeIntersect(in Ray r, in Plane p)
     return t;
 }
 
+float aabbIntersect(in Ray r, in AABB box) {
+    vec3 tbot = (box.bMin - r.o) / r.d;
+    vec3 ttop = (box.bMax - r.o) / r.d;
+    vec3 tmin = min(ttop, tbot);
+    vec3 tmax = max(ttop, tbot);
+    float t1 = max(max(tmin.x, tmin.y), tmin.z);
+    float t2 = min(min(tmax.x, tmax.y), tmax.z);
+    if (t2 <= t1)
+        return -1;
+    return t1;
+}
+
+
 float triangleIntersect(in Ray r, in Triangle tr)
 {
     vec3 v1v0 = tr.v1 - tr.v0;
@@ -67,35 +80,48 @@ int intersect(in Ray r, out float tRest)
         tMin = t;
     }
 
-    for (int i = 0; i < spheres.length(); i++)
+    int n = 0;
+
+    for (n = 0; n < spheres.length(); n++)
     {
-        t = sphereIntersect(r, spheres[i]);
+        t = sphereIntersect(r, spheres[n]);
 
         if (t > EPSILON && t < tMin)
         {
-            id = i;
+            id = n;
             tMin = t;
         }
     }
 
-    for (int i = 0; i < planes.length(); i++)
+    for (int i = 0; i < planes.length(); i++, n++)
     {
         t = planeIntersect(r, planes[i]);
 
         if (t > EPSILON && t < tMin)
         {
-            id = i + spheres.length();
+            id = n;
             tMin = t;
         }
     }
 
-    for (int i = 0; i < triangles.length(); i++)
+    for (int i = 0; i < triangles.length(); i++, n++)
     {
         t = triangleIntersect(r, triangles[i]);
 
         if (t > EPSILON && t < tMin)
         {
-            id = i + spheres.length() + planes.length();
+            id = n;
+            tMin = t;
+        }
+    }
+
+    for (int i = 0; i < boxes.length(); i++, n++)
+    {
+        t = aabbIntersect(r, boxes[i]);
+
+        if (t > EPSILON && t < tMin)
+        {
+            id = n;
             tMin = t;
         }
     }
@@ -139,6 +165,14 @@ int intersect(in Ray r)
     for (int i = 0; i < triangles.length(); i++)
     {
         t = triangleIntersect(r, triangles[i]);
+
+        if (t > EPSILON && t < tMin)
+            return 0;
+    }
+
+    for (int i = 0; i < boxes.length(); i++)
+    {
+        t = aabbIntersect(r, boxes[i]);
 
         if (t > EPSILON && t < tMin)
             return 0;

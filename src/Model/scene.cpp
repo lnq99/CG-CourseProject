@@ -27,3 +27,8 @@ void Scene::addTriangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, Material mat)
 {
     triangles.push_back(Triangle { v0, 0, v1, 0, v2 });
 }
+
+void Scene::addBox(glm::vec3 bMin, glm::vec3 bMax, Material mat)
+{
+    boxes.push_back(AABB { mat, bMin, 0, bMax });
+}

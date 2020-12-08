@@ -74,6 +74,8 @@ static void createScene(Scene &s)
     for (auto i : f) {
         s.addTriangle(v[i[0]], v[i[1]], v[i[2]]);
     }
+
+    s.addBox({1.5,-4,-2}, {2.5,-2.5,-1}, s.store.get("minor"));
 }
 
 VulkanApp App(setupCamera, createScene);

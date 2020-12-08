@@ -20,6 +20,7 @@ void VulkanApp::OnUpdateUIOverlay()
 
     auto nSpheres = scene.spheres.size();
     auto nPlanes = scene.planes.size();
+    auto nBoxes = scene.boxes.size();
     int n = nSpheres;
 
     if (ImGui::CollapsingHeader("Scene", ImGuiTreeNodeFlags_DefaultOpen))
@@ -48,7 +49,7 @@ void VulkanApp::OnUpdateUIOverlay()
 
         char buf[24];
 
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX());
+        // ImGui::SetCursorPosX(ImGui::GetCursorPosX());
     
         ImGui::BeginChild("Sphere", ImVec2(110, 120), true);
         for (int i = 0; i < nSpheres; i++)
@@ -73,7 +74,15 @@ void VulkanApp::OnUpdateUIOverlay()
         ImGui::SameLine();
 
         ImGui::BeginChild("Object", ImVec2(110, 120), true, ImGuiWindowFlags_HorizontalScrollbar);
-        if (ImGui::Selectable("Diamond", scene.selected == n))
+        for (int i = 0; i < nBoxes; i++, n++)
+        {
+            sprintf(buf, "%02d | %s %d", n, "Box ", i);
+            if (ImGui::Selectable(buf, scene.selected == n))
+                scene.selected = n;
+        }
+    
+        sprintf(buf, "%02d | %s", n, "Diamond");
+        if (ImGui::Selectable(buf, scene.selected == n))
             scene.selected = n;
         ImGui::EndChild();
     }
@@ -87,11 +96,20 @@ void VulkanApp::OnUpdateUIOverlay()
         if (ImGui::TreeNodeEx("Add Object"))
         {
             static int e = 0;
-            ImGui::RadioButton("Sphere", &e, 0); ImGui::SameLine(150);
+            ImGui::RadioButton("Sphere", &e, 0); ImGui::SameLine(120);
+            ImGui::RadioButton("Box", &e, 1); ImGui::SameLine(200);
             if (ImGui::Button("Add"))
             {
-                scene.addSphere({0,0,0}, 0.5);
-                scene.selected = nSpheres++;
+                if (e)
+                {
+                    scene.addBox({3,-4,-2}, {4,-3,-1});
+                    scene.selected = n;
+                }
+                else
+                {
+                    scene.addSphere({0,0,0}, 0.5);
+                    scene.selected = nSpheres++;
+                }
             }
             ImGui::TreePop();
         }
@@ -100,16 +118,18 @@ void VulkanApp::OnUpdateUIOverlay()
 
         if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            if (scene.selected < nSpheres)
+            auto selected = scene.selected;
+            if (selected < nSpheres)
             {
-                auto& sphere = scene.spheres[scene.selected];
+                auto& sphere = scene.spheres[selected];
                 ImGui::DragFloat3("Translate", &sphere.pos.x, 0.05, -4, 4, "%.2f");
                 ImGui::DragFloat("Radius", &sphere.radius, 0.02, 0.2, 1.5, "%.2f");
             }
-            // else if (scene.selected == n)
-            // {
-            //     ImGui::DragFloat3("Translate", &scene.translate.x, 0.05);
-            // }
+            else if (selected < n && (selected -= nSpheres + nPlanes) >= 0)
+            {
+                ImGui::DragFloat3("boxMin", &scene.boxes[selected].bMin.x, 0.1, -4, 4, "%.1f");
+                ImGui::DragFloat3("boxMax", &scene.boxes[selected].bMax.x, 0.1, -4, 4, "%.1f");
+            }
             ImGui::TreePop();
         }
 
@@ -118,17 +138,22 @@ void VulkanApp::OnUpdateUIOverlay()
         if (ImGui::TreeNodeEx("Material", ImGuiTreeNodeFlags_DefaultOpen))
         {
             Material* m;
-            if (scene.selected < nSpheres)
+            auto selected = scene.selected;
+            if (selected < nSpheres)
             {
-                m = &scene.spheres[scene.selected].material;
+                m = &scene.spheres[selected].material;
             }
-            else if (scene.selected == n)
+            else if (selected == n)
             {
                 m = &scene.ubo.material;
             }
+            else if ((selected -= nSpheres) < nPlanes)
+            {
+                m = &scene.planes[selected].material;
+            }
             else
             {
-                m = &scene.planes[scene.selected - nSpheres].material;
+                m = &scene.boxes[selected - nPlanes].material;
             }
             
             ImGui::ColorEdit3("Base Color", &m->color.x);
