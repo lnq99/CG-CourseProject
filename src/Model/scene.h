@@ -1,7 +1,7 @@
-#pragma one
+#pragma once
 
 #include "entity.h"
-
+#include "parser.h"
 #include <vector>
 
 
@@ -31,6 +31,7 @@ public:
 
 public:
     static Scene& instance();
+    void addModel(const char *path);
     void addSphere(glm::vec3 pos, float radius, Material = defaultMaterial);
     void addPlane(glm::vec3 normal, float distance, Material = defaultMaterial);
     void addTriangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, Material = defaultMaterial);
@@ -41,4 +42,5 @@ private:
     Scene(const Scene&) = delete;
     void operator=(const Scene&) = delete;
     static const Material defaultMaterial;
+    Parser& parser;
 };

@@ -4,6 +4,7 @@ const Material Scene::defaultMaterial = { glm::vec3(1), .1, .7, 0 };
 
 
 Scene::Scene()
+    : parser(Parser::instance())
 {
 }
 
@@ -11,6 +12,12 @@ Scene& Scene::instance()
 {
     static Scene scene;
     return scene;
+}
+
+void Scene::addModel(const char *path)
+{
+    auto model = parser.newModel(path);
+    model.toTriangles(triangles);
 }
 
 void Scene::addSphere(glm::vec3 pos, float radius, Material mat)

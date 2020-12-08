@@ -1,4 +1,4 @@
-#pragma one
+#pragma once
 
 #include <unordered_map>
 #include <glm/vec3.hpp>
