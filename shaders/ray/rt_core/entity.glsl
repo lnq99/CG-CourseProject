@@ -56,7 +56,7 @@ layout (binding = 1) uniform UBO
     mat4 rotMat;
     Material material;
     vec3 lightColor;
-    float lightRadius;
+    int raybounces;
 } ubo;
 
 layout (std140, binding = 2) buffer Spheres

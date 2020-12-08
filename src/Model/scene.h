@@ -14,7 +14,7 @@ struct SceneUBO
     glm::mat4 rot;
     Material material;
     glm::vec3 lightColor;
-    float lightRadius;
+    int raybounces = 6;
 };
 
 

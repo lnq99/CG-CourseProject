@@ -27,24 +27,18 @@ void VulkanApp::OnUpdateUIOverlay()
     {
         ImGui::Spacing();
 
-        if (ImGui::TreeNodeEx("Point Light", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            // ImGui::DragFloat3("Position", &scene.ubo.lightPos.x);
-            ImGui::SliderFloat3("Color", &scene.ubo.lightColor.x, 0, 25, "%.0f");
-            ImGui::SliderFloat("Ambient", &scene.ubo.ambient, 0, 4, "%.1f");
-            ImGui::TreePop();
-        }
+        // ImGui::DragFloat3("Position", &scene.ubo.lightPos.x);
+        ImGui::DragFloat3("Light Color", &scene.ubo.lightColor.x, 0.5, 0, 25, "%.1f");
+
+        ImGui::DragFloat("Ambient", &scene.ubo.ambient, 0.1, 0, 4, "%.1f");
+
+        ImGui::DragFloat("Camera radius", &camera.radius, 0.1, 1, 4, "%.1f");
+        if (ImGui::IsItemEdited())
+            camera.updatePosition();
+
+        ImGui::DragInt("Ray bounces", &scene.ubo.raybounces, 1, 1, 10);
 
         ImGui::Spacing();
-
-        if (ImGui::TreeNodeEx("Camera", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            ImGui::SliderFloat("Radius", &camera.radius, 1, 4, "%.1f");
-            if (ImGui::IsItemEdited())
-                camera.updatePosition();
-            ImGui::TreePop();
-        }
-
         ImGui::Spacing();
 
         char buf[24];
@@ -188,7 +182,7 @@ void VulkanApp::OnUpdateUIOverlay()
             else
             {
                 ImGui::SliderFloat("Reflect", &m->k, 0, 1, "%.2f");
-                ImGui::SliderFloat("IOR", &m->ior, 0.5, 3, "%.2f");
+                ImGui::SliderFloat("IOR", &m->ior, 0.5, 4, "%.2f");
             }
 
             ImGui::TreePop();

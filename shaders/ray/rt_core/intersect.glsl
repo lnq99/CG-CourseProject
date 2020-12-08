@@ -69,7 +69,7 @@ int intersect(in Ray r, out float tRest)
     Sphere light = Sphere(
         m,
         ubo.lightPos,
-        ubo.lightRadius
+        0.05
     );
 
     t = sphereIntersect(r, light);
@@ -140,7 +140,7 @@ int intersect(in Ray r)
     Sphere light = Sphere(
         m,
         ubo.lightPos,
-        ubo.lightRadius
+        0.05
     );
 
     float tMin = sphereIntersect(r, light);

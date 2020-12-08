@@ -8,9 +8,8 @@ VulkanApp::VulkanApp(void (*setupCamera)(Camera &), void (*createScene)(Scene &)
 {
     title = "Compute shader - ray tracing";
 
-    scene.ubo.lightPos = { 0, 3.8, 0 };
+    scene.ubo.lightPos = { 0, 4, 0 };
     scene.ubo.lightColor = glm::vec3(12);
-    scene.ubo.lightRadius = 0.05;
     scene.ubo.ambient = 1.5;
     scene.ubo.aspectRatio = (float)width / (float)height;
 

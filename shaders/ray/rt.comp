@@ -15,7 +15,7 @@ vec3 pixelColor(inout Ray r)
     vec3 color = getColor(r, k, ior);
 
     float kRest = k;
-    for (int i = 0; kRest > EPSILON && i < RAYBOUNCES; i++)
+    for (int i = 0; kRest > EPSILON && i < ubo.raybounces; i++)
     {
         vec3 cumulativeColor = getColor(r, k, ior);
         color = mix(color, mix(cumulativeColor, color, 1.0 - kRest), kRest);

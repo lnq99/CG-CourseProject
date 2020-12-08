@@ -13,10 +13,10 @@ static void createScene(Scene &s)
     s.ubo.material = s.store.get("diamond", {1, 1, 1});
 
     // Spheres
-    s.addSphere(glm::vec3(2.5, -0.5, 0), 0.6, s.store.get("plastic", glm::vec3(0.3, 0.6, 0.9)));
+    s.addSphere(glm::vec3(2.5, -0.5, 0), 0.6, s.store.get("minor", glm::vec3(0.3, 0.6, 0.9)));
     s.addSphere(glm::vec3(0.8, -1, 0.2), 0.5, s.store.get("shiny", glm::vec3(0.6, 0.7, 1)));
     s.addSphere(glm::vec3(-1.75, -0.75, -0.8), 1, s.store.get("metal", glm::vec3(0.9, 0.76, 0.46)));
-    s.addSphere(glm::vec3(-0.5, -1.2, 0.5), 0.6, s.store.get("glass", {1, 1, 1}));
+    s.addSphere(glm::vec3(-0.5, -1.5, 0.5), 0.6, s.store.get("glass", {1, 1, 1}));
 
     // Planes
     const float halfEdge = 4;
@@ -75,7 +75,7 @@ static void createScene(Scene &s)
         s.addTriangle(v[i[0]], v[i[1]], v[i[2]]);
     }
 
-    s.addBox({1.5,-4,-2}, {2.5,-2.5,-1}, s.store.get("minor"));
+    s.addBox({1.8,-4,-1.2}, {3,-2.5,-0.2}, s.store.get("plastic"));
 }
 
 VulkanApp App(setupCamera, createScene);
