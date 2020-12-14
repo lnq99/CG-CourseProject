@@ -8,7 +8,7 @@ function(build)
 
     SET(MAIN_CPP ${FOLDER}/main.cpp)
 
-    # imgui example requires additional source files
+    # imgui requires additional source files
     file(GLOB ADD_SOURCE "../lib/imgui/*.cpp")
     SET(SOURCE ${SOURCE} ${ADD_SOURCE})
 

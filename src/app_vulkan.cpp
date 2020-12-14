@@ -297,7 +297,7 @@ void VulkanApp::prepareCompute()
             setLayoutBindings.data(),
             setLayoutBindings.size());
 
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr,    &compute.descriptorSetLayout));
+    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &compute.descriptorSetLayout));
 
     VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo =
         vks::initializers::pipelineLayoutCreateInfo(
@@ -453,11 +453,11 @@ void VulkanApp::preparePipelines()
             1,
             &blendAttachmentState);
 
-    VkPipelineDepthStencilStateCreateInfo depthStencilState =
-        vks::initializers::pipelineDepthStencilStateCreateInfo(
-            VK_FALSE,
-            VK_FALSE,
-            VK_COMPARE_OP_LESS_OR_EQUAL);
+    // VkPipelineDepthStencilStateCreateInfo depthStencilState =
+    //     vks::initializers::pipelineDepthStencilStateCreateInfo(
+    //         VK_FALSE,
+    //         VK_FALSE,
+    //         VK_COMPARE_OP_LESS_OR_EQUAL);
 
     VkPipelineViewportStateCreateInfo viewportState =
         vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
@@ -502,7 +502,7 @@ void VulkanApp::preparePipelines()
     pipelineCreateInfo.pColorBlendState = &colorBlendState;
     pipelineCreateInfo.pMultisampleState = &multisampleState;
     pipelineCreateInfo.pViewportState = &viewportState;
-    pipelineCreateInfo.pDepthStencilState = &depthStencilState;
+    // pipelineCreateInfo.pDepthStencilState = &depthStencilState;
     pipelineCreateInfo.pDynamicState = &dynamicState;
     pipelineCreateInfo.stageCount = 2;
     pipelineCreateInfo.pStages = shaderStages;
@@ -611,9 +611,10 @@ void VulkanApp::prepareStorageBuffers()
 
 void VulkanApp::updateUniformBuffers()
 {
-    scene.ubo.lightPos.x = 0.0f + sin(glm::radians(timer * 360.0f)) * cos(glm::radians(timer * 360.0f)) * 2.5;
-    scene.ubo.lightPos.y = 0.0f + sin(glm::radians(timer * 360.0f)) * 2.5;
-    scene.ubo.lightPos.z = 0.0f + cos(glm::radians(timer * 360.0f)) * 2.5;
+    auto t = glm::radians(timer * 360);
+    scene.ubo.lightPos.x = sin(t) * cos(t) * 2.5;
+    scene.ubo.lightPos.y = sin(t) * 2.5;
+    scene.ubo.lightPos.z = cos(t) * 2.5;
     scene.ubo.cameraPos = camera.position;
     scene.ubo.rot = camera.rotM;
 
@@ -662,8 +663,8 @@ void VulkanApp::prepare()
 
 void VulkanApp::render()
 {
-    if (!prepared)
-        return;
+    // if (!prepared)
+    //     return;
     draw();
     if (!paused)
     {

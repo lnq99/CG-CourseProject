@@ -16,16 +16,15 @@ public:
     vks::Texture textureComputeTarget;
     Scene& scene;
 
-    // Resources for the graphics part of the example
+    // Resources for the graphics part
     struct {
         VkDescriptorSetLayout descriptorSetLayout;    // Raytraced image display shader binding layout
-        VkDescriptorSet descriptorSetPreCompute;    // Raytraced image display shader bindings before compute shader image manipulation
         VkDescriptorSet descriptorSet;                // Raytraced image display shader bindings after compute shader image manipulation
         VkPipeline pipeline;                        // Raytraced image display pipeline
         VkPipelineLayout pipelineLayout;            // Layout of the graphics pipeline
     } graphics;
 
-    // Resources for the compute part of the example
+    // Resources for the compute part
     struct {
         struct {
             vks::Buffer spheres;                        // (Shader) storage buffer object with scene spheres
