@@ -30,7 +30,7 @@ void Scene::addPlane(glm::vec3 normal, float distance, Material mat)
     planes.push_back(Plane { mat, normal, distance });
 }
 
-void Scene::addTriangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, Material mat)
+void Scene::addTriangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2)
 {
     triangles.push_back(Triangle { v0, 0, v1, 0, v2 });
 }

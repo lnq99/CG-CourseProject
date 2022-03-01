@@ -9,9 +9,7 @@ struct Ray
 struct Material
 {
     vec3 color;
-    float ka;
-    float kd;
-    float ks;
+    float ka, kd, ks;
     float shininess;
     float k;
     float ior;

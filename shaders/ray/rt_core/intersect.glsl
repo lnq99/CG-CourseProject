@@ -37,23 +37,40 @@ float aabbIntersect(in Ray r, in AABB box) {
     return t1;
 }
 
-
+// Möller-Trumbore algorithm
+// Алгоритм Моллера — Трумбора
+// https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 float triangleIntersect(in Ray r, in Triangle tr)
 {
-    vec3 v1v0 = tr.v1 - tr.v0;
-    vec3 v2v0 = tr.v2 - tr.v0;
-    vec3 rov0 = r.o - tr.v0;
+    vec3 v0v1 = tr.v1 - tr.v0;
+    vec3 v0v2 = tr.v2 - tr.v0;
+    // vec3 n = cross(v0v1, v0v2);
+    // vec3 v0ro = r.o - tr.v0;
+    // vec3 q = cross(v0ro, r.d);
+    // float d = 1 / dot(r.d, n);
+    // float u = d * dot(-q, v0v2);
+    // float v = d * dot( q, v0v1);
 
-    vec3  n = cross(v1v0, v2v0);
-    vec3  q = cross(rov0, r.d);
-    float d = 1 / dot(r.d, n);
-    float u = d * dot(-q, v2v0);
-    float v = d * dot( q, v1v0);
-    float t = d * dot(-n, rov0);
+    // if (u < 0 || v < 0 || (u+v) > 1)
+    //     return -1;
 
-    if (u < 0 || v < 0 || (u+v) > 1)
-        t = -1;
+    // float t = d * dot(-n, v0ro);
+    // return t;
 
+    vec3 pvec = cross(r.d, v0v2);
+    float det = dot(v0v1, pvec);
+    if (abs(det) < EPSILON) return -1;
+
+    float invDet = 1 / det;
+    vec3 tvec = r.o - tr.v0;
+    float u = dot(tvec, pvec) * invDet;
+    if (u < 0 || u > 1) return -1;
+
+    vec3 qvec = cross(tvec, v0v1);
+    float v = dot(r.d, qvec) * invDet;
+    if (v < 0 || u + v > 1) return -1;
+
+    float t = dot(v0v2, qvec) * invDet;
     return t;
 }
 

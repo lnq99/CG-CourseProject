@@ -34,7 +34,7 @@ public:
     void addModel(const char *path);
     void addSphere(glm::vec3 pos, float radius, Material = defaultMaterial);
     void addPlane(glm::vec3 normal, float distance, Material = defaultMaterial);
-    void addTriangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, Material = defaultMaterial);
+    void addTriangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2);
     void addBox(glm::vec3 bMin, glm::vec3 bMax, Material = defaultMaterial);
 
 private:

@@ -33,6 +33,31 @@ static void createScene(Scene &s)
     // Model
     s.ubo.material = m.get("diamond",{1,1,1});
     s.addModel("data/diamond.obj");
+
+
+    // Benchmark
+
+    // const float half = 4;
+    // s.addPlane({0,1,0}, half, m.get("diffuse"));
+    // s.addPlane({0,-1,0}, half, m.get("diffuse"));
+    // s.addPlane({0,0,1}, half, m.get("diffuse"));
+    // s.addPlane({0,0,-1}, half, m.get("diffuse"));
+    // s.addPlane({-1,0,0}, half, m.get("diffuse"));
+    // s.addPlane({1,0,0}, half, m.get("diffuse"));
+
+    // auto randPoint = [](int lo=-4, int hi=4) 
+    // {
+    //     return glm::vec3(
+    //         lo + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX/(hi-lo))),
+    //         lo + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX/(hi-lo))),
+    //         lo + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX/(hi-lo)))
+    //     );
+    // };
+
+    // for (auto i = 0; i < 28; i++)
+    // {
+    //     s.addTriangle(randPoint(),randPoint(),randPoint());
+    // }
 }
 
 VulkanApp App(setupCamera, createScene);
