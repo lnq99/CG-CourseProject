@@ -8,9 +8,7 @@ VulkanApp::VulkanApp(void (*setupCamera)(Camera &), void (*createScene)(Scene &)
 {
     title = "Compute shader - ray tracing";
 
-    scene.ubo.lightPos = { 0, 3.8, 0 };
     scene.ubo.lightColor = glm::vec3(12);
-    scene.ubo.lightRadius = 0.05;
     scene.ubo.ambient = 1.5;
     scene.ubo.aspectRatio = (float)width / (float)height;
 
@@ -37,9 +35,8 @@ VulkanApp::~VulkanApp()
     compute.storageBuffers.spheres.destroy();
     compute.storageBuffers.planes.destroy();
     compute.storageBuffers.triangles.destroy();
-    compute.stagingBuffer1.destroy();
-    compute.stagingBuffer2.destroy();
-    compute.stagingBuffer3.destroy();
+    compute.storageBuffers.boxes.destroy();
+    compute.stagingBuffer.destroy();
 
     textureComputeTarget.destroy();
 }
@@ -287,7 +284,12 @@ void VulkanApp::prepareCompute()
         vks::initializers::descriptorSetLayoutBinding(
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             VK_SHADER_STAGE_COMPUTE_BIT,
-            4)
+            4),
+        // Binding 5: Shader storage buffer for the boxes
+        vks::initializers::descriptorSetLayoutBinding(
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            VK_SHADER_STAGE_COMPUTE_BIT,
+            5)
     };
 
     VkDescriptorSetLayoutCreateInfo descriptorLayout =
@@ -295,7 +297,7 @@ void VulkanApp::prepareCompute()
             setLayoutBindings.data(),
             setLayoutBindings.size());
 
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr,    &compute.descriptorSetLayout));
+    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &compute.descriptorSetLayout));
 
     VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo =
         vks::initializers::pipelineLayoutCreateInfo(
@@ -343,7 +345,13 @@ void VulkanApp::prepareCompute()
             compute.descriptorSet,
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             4,
-            &compute.storageBuffers.triangles.descriptor)
+            &compute.storageBuffers.triangles.descriptor),
+        // Binding 5: Shader storage buffer for the boxes
+        vks::initializers::writeDescriptorSet(
+            compute.descriptorSet,
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            5,
+            &compute.storageBuffers.boxes.descriptor)
     };
 
     vkUpdateDescriptorSets(device, computeWriteDescriptorSets.size(), computeWriteDescriptorSets.data(), 0, NULL);
@@ -445,11 +453,11 @@ void VulkanApp::preparePipelines()
             1,
             &blendAttachmentState);
 
-    VkPipelineDepthStencilStateCreateInfo depthStencilState =
-        vks::initializers::pipelineDepthStencilStateCreateInfo(
-            VK_FALSE,
-            VK_FALSE,
-            VK_COMPARE_OP_LESS_OR_EQUAL);
+    // VkPipelineDepthStencilStateCreateInfo depthStencilState =
+    //     vks::initializers::pipelineDepthStencilStateCreateInfo(
+    //         VK_FALSE,
+    //         VK_FALSE,
+    //         VK_COMPARE_OP_LESS_OR_EQUAL);
 
     VkPipelineViewportStateCreateInfo viewportState =
         vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
@@ -494,7 +502,7 @@ void VulkanApp::preparePipelines()
     pipelineCreateInfo.pColorBlendState = &colorBlendState;
     pipelineCreateInfo.pMultisampleState = &multisampleState;
     pipelineCreateInfo.pViewportState = &viewportState;
-    pipelineCreateInfo.pDepthStencilState = &depthStencilState;
+    // pipelineCreateInfo.pDepthStencilState = &depthStencilState;
     pipelineCreateInfo.pDynamicState = &dynamicState;
     pipelineCreateInfo.stageCount = 2;
     pipelineCreateInfo.pStages = shaderStages;
@@ -511,11 +519,9 @@ void VulkanApp::prepareStorageBuffers()
     vulkanDevice->createBuffer(
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        &compute.stagingBuffer1,
+        &compute.stagingBuffer,
         storageBufferSize,
         scene.spheres.data());
-
-    // updateSphere();
 
     vulkanDevice->createBuffer(
         // The SSBO will be used as a storage buffer for the compute pipeline and as a vertex buffer in the graphics pipeline
@@ -528,7 +534,7 @@ void VulkanApp::prepareStorageBuffers()
     VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
     VkBufferCopy copyRegion = {};
     copyRegion.size = storageBufferSize;
-    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer1.buffer, compute.storageBuffers.spheres.buffer, 1, &copyRegion);
+    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer.buffer, compute.storageBuffers.spheres.buffer, 1, &copyRegion);
     vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 
     storageBufferSize = scene.planes.size() * sizeof(Plane);
@@ -537,7 +543,7 @@ void VulkanApp::prepareStorageBuffers()
     vulkanDevice->createBuffer(
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        &compute.stagingBuffer2,
+        &compute.stagingBuffer,
         storageBufferSize,
         scene.planes.data());
 
@@ -551,7 +557,7 @@ void VulkanApp::prepareStorageBuffers()
     // Copy to staging buffer
     copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
     copyRegion.size = storageBufferSize;
-    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer2.buffer, compute.storageBuffers.planes.buffer, 1, &copyRegion);
+    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer.buffer, compute.storageBuffers.planes.buffer, 1, &copyRegion);
     vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 
 
@@ -561,7 +567,7 @@ void VulkanApp::prepareStorageBuffers()
     vulkanDevice->createBuffer(
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        &compute.stagingBuffer3,
+        &compute.stagingBuffer,
         storageBufferSize,
         scene.triangles.data());
 
@@ -575,15 +581,40 @@ void VulkanApp::prepareStorageBuffers()
     // Copy to staging buffer
     copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
     copyRegion.size = storageBufferSize;
-    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer3.buffer, compute.storageBuffers.triangles.buffer, 1, &copyRegion);
+    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer.buffer, compute.storageBuffers.triangles.buffer, 1, &copyRegion);
+    vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+
+
+    storageBufferSize = scene.boxes.size() * sizeof(AABB);
+
+    // Stage
+    vulkanDevice->createBuffer(
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        &compute.stagingBuffer,
+        storageBufferSize,
+        scene.boxes.data());
+
+    vulkanDevice->createBuffer(
+        // The SSBO will be used as a storage buffer for the compute pipeline and as a vertex buffer in the graphics pipeline
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        &compute.storageBuffers.boxes,
+        N_BOX * sizeof(AABB));
+
+    // Copy to staging buffer
+    copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+    copyRegion.size = storageBufferSize;
+    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer.buffer, compute.storageBuffers.boxes.buffer, 1, &copyRegion);
     vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 }
 
 void VulkanApp::updateUniformBuffers()
 {
-    scene.ubo.lightPos.x = 0.0f + sin(glm::radians(timer * 360.0f)) * cos(glm::radians(timer * 360.0f)) * 2.5;
-    scene.ubo.lightPos.y = 0.0f + sin(glm::radians(timer * 360.0f)) * 2.5;
-    scene.ubo.lightPos.z = 0.0f + cos(glm::radians(timer * 360.0f)) * 2.5;
+    auto t = glm::radians(timer * 360);
+    scene.ubo.lightPos.x = sin(t) * cos(t) * 2.5;
+    scene.ubo.lightPos.y = sin(t) * 2.5;
+    scene.ubo.lightPos.z = cos(t) * 2.5;
     scene.ubo.cameraPos = camera.position;
     scene.ubo.rot = camera.rotM;
 
@@ -632,12 +663,12 @@ void VulkanApp::prepare()
 
 void VulkanApp::render()
 {
-    if (!prepared)
-        return;
+    // if (!prepared)
+    //     return;
     draw();
     if (!paused)
     {
-        updateSphere();
+        updateScene();
         updateUniformBuffers();
     }
 }
@@ -648,20 +679,38 @@ void VulkanApp::viewChanged()
     updateUniformBuffers();
 }
 
-void VulkanApp::updateSphere()
+void VulkanApp::updateScene()
 {
-    auto nSphere = scene.spheres.size();
+    VK_CHECK_RESULT(compute.stagingBuffer.map());
 
-    VK_CHECK_RESULT(compute.stagingBuffer1.map());
-    memcpy(compute.stagingBuffer1.mapped, scene.spheres.data(), nSphere * sizeof(Sphere));
-    compute.stagingBuffer1.unmap();
 
-    VkDeviceSize storageBufferSize = nSphere * sizeof(Sphere);
+    auto n = scene.spheres.size();
+    memcpy(compute.stagingBuffer.mapped, scene.spheres.data(), n * sizeof(Sphere));
 
-    // Copy to staging buffer
     VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
     VkBufferCopy copyRegion = {};
-    copyRegion.size = storageBufferSize;
-    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer1.buffer, compute.storageBuffers.spheres.buffer, 1, &copyRegion);
+    copyRegion.size = n * sizeof(Sphere);
+    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer.buffer, compute.storageBuffers.spheres.buffer, 1, &copyRegion);
     vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+
+
+    n = scene.planes.size();
+    memcpy(compute.stagingBuffer.mapped, scene.planes.data(), n * sizeof(Plane));
+
+    copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+    copyRegion.size = n * sizeof(Plane);
+    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer.buffer, compute.storageBuffers.planes.buffer, 1, &copyRegion);
+    vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+
+
+    n = scene.boxes.size();
+    memcpy(compute.stagingBuffer.mapped, scene.boxes.data(), n * sizeof(AABB));
+
+    copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+    copyRegion.size = n * sizeof(AABB);
+    vkCmdCopyBuffer(copyCmd, compute.stagingBuffer.buffer, compute.storageBuffers.boxes.buffer, 1, &copyRegion);
+    vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+
+
+    compute.stagingBuffer.unmap();
 }

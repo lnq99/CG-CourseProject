@@ -8,12 +8,21 @@ function(build)
 
     SET(MAIN_CPP ${FOLDER}/main.cpp)
 
-    # imgui example requires additional source files
+    # imgui requires additional source files
     file(GLOB ADD_SOURCE "../lib/imgui/*.cpp")
     SET(SOURCE ${SOURCE} ${ADD_SOURCE})
 
+    execute_process (
+        COMMAND bash -c "sha1sum /etc/machine-id | cut -d ' ' -f1"
+        OUTPUT_VARIABLE machine_id
+    )
+
+    string(STRIP ${machine_id} machine_id)
+
+    add_compile_definitions(MACHINE_ID_HASH="${machine_id}")
+
     add_executable(${NAME} ${MAIN_CPP} ${SOURCE})
-    target_link_libraries(${NAME} vkbase )
+    target_link_libraries(${NAME} vkbase crypto)
 
     set_target_properties(${NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 

@@ -63,6 +63,11 @@ vec3 getColor(inout Ray r, inout float k, inout float ior)
         normal = triangleNormal(triangles[id]);
         m = ubo.material;
     }
+    else if ((id -= triangles.length()) < triangles.length())
+    {
+        normal = aabbNormal(r.o, boxes[id]);
+        m = boxes[id].material;
+    }
 
     if (m.ior != 0)
     {

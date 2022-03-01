@@ -1,0 +1,63 @@
+\chapter*{Введение}
+\addcontentsline{toc}{chapter}{Введение}
+
+
+Компьютерная графика - основная технология в цифровой фотографии, кино, видеоиграх,
+дисплеях телефона и компьютера,
+а также многие другие приложения.
+Разработано специализированное оборудование и программное обеспечение,
+с дисплеями большинства устройств, управляемых оборудованием компьютерной графики.
+В наши дни технологии быстро развиваются, компьютеры становятся все более мощными.
+Из-за этого мы ожидаем чего-то более реалистичного в видеоигре или фильме, картинке.
+Следовательно, многие методы рендеринга, основанные на физике, развиваются и продолжают развиваться.
+\\
+
+Коробка Корнелла - это тест, направленный на определение точности программного обеспечения для рендеринга путем сравнения визуализированной сцены с реальной фотографией той же сцены, и он стал широко используемой тестовой 3D-моделью.
+\\
+
+Целью данной работы является
+разработка программу моделирования коробки Корнелла, реализация простого физически основанного рендерера,
+рендеринга на графическом процессоре.
+Рендерер должен демонстрировать следующие оптические свойства:
+отражение, преломление.
+Некоторые основные материалы: пластик, стекло, металл, зеркало.
+\\
+
+% Computer graphics is a core technology in digital photography, film, video games,
+% phone and computer displays, and many other applications.
+% Specialized hardware and software has been developed,
+% with the displays of most devices being driven by computer graphics hardware.
+% Nowaday, technology evolve quickly, computer become more and more powerfull.
+% Because of this, we're expecting something that looks more realistic in the video game or movie, picture.
+% Consequently, many physics-based rendering techniques are and continue to evolve.
+
+% Purpose of this work is implementing a simple physically based renderer, render on gpu.
+% Renderer must show these optical properties: reflect, refract, specular, (fernel effect)... .
+% Some basic materials: plastics, glass, metal, (rough rock, take long time to render).
+% Since i didn't know yet how long it's take to render 1 frame of photorealistic image,
+% i will try in two ways, then pick better:
+
+% \begin{itemize}
+%     \item Simple renderer, it's must fast, with dynamic scene (minimum 30fps on gpu gtx1050).
+%     \item Offscreen renderer with rough materials and global illumination which take long time to render.
+% \end{itemize}
+
+% (Progressing renderering is the best choice but hard for me to implement.)\\
+
+
+% So, the subtask are:
+Итак, подзадачи:
+
+\begin{itemize}
+    \setlength{\itemsep}{0em}
+    \item Формализовать объекты сцены
+    \item Анализировать алгоритмов удаления невидимых поверхностей
+    \item Выбрать модели освещения
+    \item Анализировать алгоритмов построения теней
+    \item Производить основные математические расчеты для реализации выбранных алгоритмов,    а также математических представлений физических свойств
+    \item Выбрать языка программирования и среды разработки
+    \item Реализовать интерфейс программного модуля
+    \item Реализовать основной модуль программы (редактор сцены)
+    \item Реализовать шейдеры (обработка данных для отображения на экране, работа на gpu)
+    % \item Implement math, physics properties of materials
+\end{itemize}
